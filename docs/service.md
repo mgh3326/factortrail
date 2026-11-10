@@ -300,11 +300,12 @@ Reported events:
 
 Before an event leaves the process, `BeforeSend` removes:
 
-- every request header except three diagnostic ones: `Content-Length` (digits
-  only), `Content-Type` (a bare `type/subtype`, no parameters) and
-  `MCP-Protocol-Version` (a `YYYY-MM-DD` date). A kept header whose value does
-  not match its format is dropped too, because header values are
-  client-controlled. The list fails closed: a client address, proxy chain, user
+- every request header except three diagnostic ones: `Content-Type`, only
+  from a fixed set (`application/json`, `text/event-stream`); `Content-Length`,
+  only as at most seven digits; and `MCP-Protocol-Version`, only as a
+  `YYYY-MM-DD` date. A kept header whose value fails its check is dropped too,
+  because header values are client-controlled and a pattern cannot tell a media
+  type from a credential. The list fails closed: a client address, proxy chain, user
   agent or credential is dropped because it is not named, so a new header never
   leaks by default. Also removed: the request environment, cookies, query
   string, body and URL;

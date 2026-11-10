@@ -99,16 +99,30 @@ var (
 
 const redacted = "[redacted]"
 
-// keptHeaders are the only request headers that may leave the process, and
-// each has a format its value must match. The list fails closed: a header not
-// named here is dropped, and a named header whose value does not match its
-// format is dropped too. Header values are client-controlled, so a value is
-// never kept just because it has no known secret shape.
-var keptHeaders = map[string]*regexp.Regexp{
-	"content-length":       regexp.MustCompile(`^[0-9]{1,12}$`),
-	"content-type":         regexp.MustCompile(`^[a-z]+/[a-z0-9.+-]+$`),
-	"mcp-protocol-version": regexp.MustCompile(`^[0-9]{4}-[0-9]{2}-[0-9]{2}$`),
+// knownMediaTypes are the Content-Type values the service answers with or
+// accepts. Content-Type is client-controlled, and a pattern cannot tell a
+// media type from a credential (application/<secret> matches any pattern), so
+// the only accepted values are these.
+var knownMediaTypes = map[string]bool{
+	"application/json":  true,
+	"text/event-stream": true,
 }
+
+// keptHeaders are the only request headers that may leave the process, and
+// each has a check its value must pass. The list fails closed: a header not
+// named here is dropped, and a named header whose value fails its check is
+// dropped too. The checks are narrow on purpose. The request body is capped at
+// 1 MiB, so Content-Length needs at most 7 digits; the protocol version is a
+// date, too low in entropy to be a credential.
+var (
+	contentLengthRE   = regexp.MustCompile(`^[0-9]{1,7}$`)
+	protocolVersionRE = regexp.MustCompile(`^[0-9]{4}-[0-9]{2}-[0-9]{2}$`)
+	keptHeaders       = map[string]func(string) bool{
+		"content-length":       contentLengthRE.MatchString,
+		"content-type":         func(v string) bool { return knownMediaTypes[v] },
+		"mcp-protocol-version": protocolVersionRE.MatchString,
+	}
+)
 
 // scrubEvent removes what must not leave the process and returns the event.
 func scrubEvent(ev *sentry.Event, literals []string) *sentry.Event {
@@ -129,8 +143,8 @@ func scrubEvent(ev *sentry.Event, literals []string) *sentry.Event {
 		// text rule.
 		headers := make(map[string]string, len(req.Headers))
 		for name, value := range req.Headers {
-			format, ok := keptHeaders[strings.ToLower(name)]
-			if !ok || !format.MatchString(value) {
+			check, ok := keptHeaders[strings.ToLower(name)]
+			if !ok || !check(value) {
 				continue
 			}
 			headers[name] = value

@@ -365,3 +365,29 @@ func TestKeptHeadersCarryOnlyDiagnosticValues(t *testing.T) {
 		t.Errorf("Mcp-Protocol-Version carrying a token was kept: %q", v)
 	}
 }
+
+func TestContentTypeIsKeptOnlyFromAKnownSet(t *testing.T) {
+	cases := map[string]bool{
+		"application/json":                          true,
+		"text/event-stream":                         true,
+		"application/" + "synthetic-bearer-value-2": false,
+		"Bearer " + synthToken:                      false,
+	}
+	for value, kept := range cases {
+		rec := &recorder{}
+		e := newReporter(t, rec)
+		r := httptest.NewRequest(http.MethodPost, "/mcp", nil)
+		r.Header.Set("Content-Type", value)
+		e.CaptureError(r, errors.New("boom"), map[string]string{"route": "/mcp"})
+		e.Flush(time.Second)
+		events := rec.sent()
+		if len(events) != 1 || events[0].Request == nil {
+			t.Fatalf("%q: want one event with a request shape, got %d", value, len(events))
+		}
+		assertClean(t, "event for Content-Type "+value, events[0])
+		_, got := events[0].Request.Headers["Content-Type"]
+		if got != kept {
+			t.Errorf("Content-Type %q kept = %v, want %v", value, got, kept)
+		}
+	}
+}
