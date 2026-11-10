@@ -337,3 +337,31 @@ func TestFlushedResponseIsCountedAsItsCommittedStatus(t *testing.T) {
 		t.Errorf("a 5xx is counted for a response that was already 200")
 	}
 }
+
+func TestKeptHeadersCarryOnlyDiagnosticValues(t *testing.T) {
+	rec := &recorder{}
+	e := newReporter(t, rec)
+	r := httptest.NewRequest(http.MethodPost, "/mcp", nil)
+	// Credential-shaped values in the headers that are kept: a value must match
+	// the header's diagnostic format or it is dropped.
+	r.Header.Set("Content-Type", "Bearer "+synthToken)
+	r.Header.Set("Content-Length", "12")
+	r.Header.Set("Mcp-Protocol-Version", synthToken)
+	e.CaptureError(r, errors.New("boom"), map[string]string{"route": "/mcp"})
+	e.Flush(time.Second)
+
+	events := rec.sent()
+	if len(events) != 1 || events[0].Request == nil {
+		t.Fatalf("want one event with a request shape, got %d", len(events))
+	}
+	assertClean(t, "event", events[0])
+	if v, ok := events[0].Request.Headers["Content-Type"]; ok {
+		t.Errorf("Content-Type carrying a token was kept: %q", v)
+	}
+	if v := events[0].Request.Headers["Content-Length"]; v != "12" {
+		t.Errorf("a well-formed Content-Length was dropped: %q", v)
+	}
+	if v, ok := events[0].Request.Headers["Mcp-Protocol-Version"]; ok {
+		t.Errorf("Mcp-Protocol-Version carrying a token was kept: %q", v)
+	}
+}

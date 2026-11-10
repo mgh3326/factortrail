@@ -99,15 +99,15 @@ var (
 
 const redacted = "[redacted]"
 
-// keptHeaders are the only request headers that may leave the process. The
-// list fails closed: a header that is not named here is dropped, so a client
-// address, proxy chain, user agent or credential cannot reach Sentry by being
-// new or unexpected.
-var keptHeaders = map[string]bool{
-	"accept":               true,
-	"content-length":       true,
-	"content-type":         true,
-	"mcp-protocol-version": true,
+// keptHeaders are the only request headers that may leave the process, and
+// each has a format its value must match. The list fails closed: a header not
+// named here is dropped, and a named header whose value does not match its
+// format is dropped too. Header values are client-controlled, so a value is
+// never kept just because it has no known secret shape.
+var keptHeaders = map[string]*regexp.Regexp{
+	"content-length":       regexp.MustCompile(`^[0-9]{1,12}$`),
+	"content-type":         regexp.MustCompile(`^[a-z]+/[a-z0-9.+-]+$`),
+	"mcp-protocol-version": regexp.MustCompile(`^[0-9]{4}-[0-9]{2}-[0-9]{2}$`),
 }
 
 // scrubEvent removes what must not leave the process and returns the event.
@@ -129,10 +129,11 @@ func scrubEvent(ev *sentry.Event, literals []string) *sentry.Event {
 		// text rule.
 		headers := make(map[string]string, len(req.Headers))
 		for name, value := range req.Headers {
-			if !keptHeaders[strings.ToLower(name)] {
+			format, ok := keptHeaders[strings.ToLower(name)]
+			if !ok || !format.MatchString(value) {
 				continue
 			}
-			headers[scrubText(name, literals)] = scrubText(value, literals)
+			headers[name] = value
 		}
 		req.Headers = headers
 		// Env (REMOTE_ADDR and similar) is client identity, not needed here.
