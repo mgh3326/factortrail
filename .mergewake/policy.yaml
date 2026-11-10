@@ -1,0 +1,32 @@
+version: 1
+enabled: true
+required_checks:
+  - verify
+  - secrets
+blocking:
+  - paths: ['internal/auth/**']
+    reason: Access verification decides who may reach every route; a change can open the service or lock out the operator.
+  - paths: ['internal/mcp/**']
+    reason: The profile table and tool registration define which tools a caller can reach; a change widens or narrows the tool surface.
+  - paths: ['internal/providers/**', 'internal/retro/**']
+    reason: Upstream and provider packages decide which data leaves the service and what authority it calls with.
+  - paths: ['cmd/**', 'internal/config/**']
+    reason: Entrypoint and configuration changes alter what the process starts with and which listeners and settings it accepts.
+  - paths: ['deploy/**', 'Dockerfile', '.dockerignore']
+    reason: Deploy, image and host-unit changes reach production directly.
+  - paths: ['.github/workflows/**', '.mergewake/**', 'go.mod', 'go.sum']
+    reason: Verification, dependency and policy changes can bypass recovery controls.
+review_gate:
+  land: graded
+fast_lane:
+  max_changed_lines: 50
+
+deploy_approval:
+  - paths: ['internal/auth/**']
+    reason: Authentication changes alter who can call the service in production.
+  - paths: ['internal/mcp/**', 'internal/providers/**', 'internal/retro/**']
+    reason: Profile, tool and upstream changes alter what an authenticated caller can read.
+  - paths: ['cmd/**', 'internal/config/**']
+    reason: Environment, secret and listener configuration changes alter how production starts.
+  - paths: ['deploy/**', 'Dockerfile', '.github/workflows/publish.yml']
+    reason: Service enablement, image and publishing changes reach production directly.
