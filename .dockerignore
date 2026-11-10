@@ -1,0 +1,15 @@
+.git
+.github
+.mergewake
+.env
+.env.*
+!.env.example
+*.pem
+*.key
+*.test
+*.out
+coverage.*
+bin/
+dist/
+docs/
+README.md
