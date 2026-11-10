@@ -11,6 +11,7 @@ import (
 	"log/slog"
 	"net/http"
 	"regexp"
+	"time"
 
 	"github.com/modelcontextprotocol/go-sdk/jsonrpc"
 	gmcp "github.com/modelcontextprotocol/go-sdk/mcp"
@@ -36,6 +37,10 @@ type Options struct {
 	// each then answers that the upstream is not configured.
 	Retro  Retro
 	Logger *slog.Logger
+	// OnToolCall, when set, is told about every call to a tool of the
+	// profile: its name, duration and whether it failed (a protocol error or
+	// a tool result with isError). Calls to any other name are not reported.
+	OnToolCall func(tool string, d time.Duration, failed bool)
 }
 
 var publicHostRE = regexp.MustCompile(`^[A-Za-z0-9]([A-Za-z0-9.-]*[A-Za-z0-9])?(:[0-9]{1,5})?$`)
@@ -56,7 +61,7 @@ func NewHandler(o Options) (http.Handler, error) {
 	if o.PublicHost != "" && !publicHostRE.MatchString(o.PublicHost) {
 		return nil, fmt.Errorf("public host %q must be a bare host name with an optional port", o.PublicHost)
 	}
-	srv := newServer(o.Version, tools, o.Retro)
+	srv := newServer(o.Version, tools, o.Retro, o.OnToolCall)
 	var h http.Handler = gmcp.NewStreamableHTTPHandler(func(*http.Request) *gmcp.Server { return srv }, &gmcp.StreamableHTTPOptions{
 		Stateless:                  true,
 		JSONResponse:               true,
@@ -105,7 +110,7 @@ func equalASCIIFold(a, b string) bool {
 // newServer builds a server that serves exactly tools. The receiving
 // middleware repeats the profile check at call time, so a handler that was
 // registered on the server by mistake is neither listed nor callable.
-func newServer(version string, tools []tool, retro Retro) *gmcp.Server {
+func newServer(version string, tools []tool, retro Retro, onToolCall func(string, time.Duration, bool)) *gmcp.Server {
 	s := gmcp.NewServer(&gmcp.Implementation{Name: DisplayName, Version: version}, &gmcp.ServerOptions{
 		// Advertise tools even when a profile has none.
 		Capabilities: &gmcp.ServerCapabilities{Tools: &gmcp.ToolCapabilities{}},
@@ -116,7 +121,35 @@ func newServer(version string, tools []tool, retro Retro) *gmcp.Server {
 		allowed[t.name] = struct{}{}
 	}
 	s.AddReceivingMiddleware(profileGuard(allowed))
+	if onToolCall != nil {
+		s.AddReceivingMiddleware(toolObserver(allowed, onToolCall))
+	}
 	return s
+}
+
+// toolObserver reports each call to an allowed tool. Names outside the
+// profile are skipped here; profileGuard refuses them anyway.
+func toolObserver(allowed map[string]struct{}, onToolCall func(string, time.Duration, bool)) gmcp.Middleware {
+	return func(next gmcp.MethodHandler) gmcp.MethodHandler {
+		return func(ctx context.Context, method string, req gmcp.Request) (gmcp.Result, error) {
+			call, ok := req.(*gmcp.CallToolRequest)
+			if method != "tools/call" || !ok || call.Params == nil {
+				return next(ctx, method, req)
+			}
+			name := call.Params.Name
+			if _, known := allowed[name]; !known {
+				return next(ctx, method, req)
+			}
+			start := time.Now()
+			res, err := next(ctx, method, req)
+			failed := err != nil
+			if r, ok := res.(*gmcp.CallToolResult); ok && r.IsError {
+				failed = true
+			}
+			onToolCall(name, time.Since(start), failed)
+			return res, err
+		}
+	}
 }
 
 func profileGuard(allowed map[string]struct{}) gmcp.Middleware {

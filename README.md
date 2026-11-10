@@ -12,6 +12,10 @@ This build serves the `retro` profile with the eight tools, behind Cloudflare Ac
 
 Later capabilities may own data quality, datasets, and analysis when their value, source of truth, validation, migration, and rollback are established.
 
+## Observability
+
+Logs are JSON on standard output. Optional Prometheus metrics (`FACTORTRAIL_METRICS_ADDR`, loopback only) and Sentry error reporting (`FACTORTRAIL_SENTRY_DSN`, off when unset) are described in [docs/service.md](docs/service.md#observability). Reports and metrics never carry a token, header, cookie, query string, email address or JWT. Creating the Sentry project and DSN, the NCP scrape setup and log collection are outside this repository's scope.
+
 ## Data policy
 
 This repository is public. It holds code and fully synthetic test data only. Real account, amount, or holdings data, including anonymized copies, never enters this repository.

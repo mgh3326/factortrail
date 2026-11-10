@@ -68,7 +68,7 @@ func testTool(name string, calls *atomic.Int32) tool {
 
 func TestUnregisteredToolIsRefused(t *testing.T) {
 	p, _ := lookupProfile("retro")
-	cs := connect(t, newServer("test", p, nil))
+	cs := connect(t, newServer("test", p, nil, nil))
 	res, err := cs.CallTool(ctxT(t), &gmcp.CallToolParams{Name: "place_order", Arguments: map[string]any{}})
 	if err == nil {
 		t.Fatalf("call of an unregistered tool succeeded: %+v", res)
@@ -80,7 +80,7 @@ func TestUnregisteredToolIsRefused(t *testing.T) {
 
 func TestProfileToolsAreServedAndOthersAreNot(t *testing.T) {
 	var inCalls, strayCalls atomic.Int32
-	srv := newServer("test", []tool{testTool("in_profile", &inCalls)}, nil)
+	srv := newServer("test", []tool{testTool("in_profile", &inCalls)}, nil, nil)
 
 	// A handler that exists on the server but is not in the profile table,
 	// as if a later change registered it by mistake.

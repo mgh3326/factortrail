@@ -22,6 +22,9 @@ const (
 	EnvAccessAllowedEmails = "FACTORTRAIL_ACCESS_ALLOWED_EMAILS"
 	EnvRetroBaseURL        = "FACTORTRAIL_RETRO_BASE_URL"
 	EnvRetroTokenFile      = "FACTORTRAIL_RETRO_TOKEN_FILE"
+	EnvMetricsAddr         = "FACTORTRAIL_METRICS_ADDR"
+	EnvSentryDSN           = "FACTORTRAIL_SENTRY_DSN"
+	EnvSentryEnvironment   = "FACTORTRAIL_SENTRY_ENVIRONMENT"
 )
 
 // DefaultAddr is the listen address when none is given: loopback only.
@@ -47,6 +50,10 @@ is always refused.
 
   ` + EnvRetroBaseURL + `       base URL of the auto_trader retro/v1 API
   ` + EnvRetroTokenFile + `     path of the file that holds the read token
+
+  ` + EnvMetricsAddr + `        loopback IP:port for the Prometheus /metrics listener (off when unset)
+  ` + EnvSentryDSN + `          Sentry DSN; error reporting is off when unset
+  ` + EnvSentryEnvironment + `  optional Sentry environment name
 
 The two upstream settings go together: both set, or both unset (the retro
 tools then answer that the upstream is not configured). One without the other
@@ -77,6 +84,12 @@ func (u Upstream) Configured() bool {
 	return u.BaseURL != "" && u.TokenFile != ""
 }
 
+// Sentry holds the error-reporting settings. Reporting is on only with a DSN.
+type Sentry struct {
+	DSN         string
+	Environment string
+}
+
 // Config is the validated serve configuration.
 type Config struct {
 	// Profile is the requested tool profile name, trimmed. The profile table
@@ -85,9 +98,13 @@ type Config struct {
 	Addr       string
 	PublicHost string
 	// Dev is local-testing mode: loopback bind only, Access optional.
-	Dev      bool
-	Access   Access
-	Upstream Upstream
+	Dev bool
+	// MetricsAddr is the loopback address of the /metrics listener. Empty
+	// means no metrics listener is started.
+	MetricsAddr string
+	Access      Access
+	Upstream    Upstream
+	Sentry      Sentry
 }
 
 // Load parses the arguments after "serve" and the environment, and refuses
@@ -127,6 +144,11 @@ func Load(args []string, getenv func(string) string) (Config, error) {
 			BaseURL:   strings.TrimSpace(getenv(EnvRetroBaseURL)),
 			TokenFile: strings.TrimSpace(getenv(EnvRetroTokenFile)),
 		},
+		MetricsAddr: strings.TrimSpace(getenv(EnvMetricsAddr)),
+		Sentry: Sentry{
+			DSN:         strings.TrimSpace(getenv(EnvSentryDSN)),
+			Environment: strings.TrimSpace(getenv(EnvSentryEnvironment)),
+		},
 	}
 	if cfg.Addr == "" {
 		cfg.Addr = DefaultAddr
@@ -138,6 +160,12 @@ func Load(args []string, getenv func(string) string) (Config, error) {
 	if cfg.Dev {
 		if err := checkLoopback(cfg.Addr); err != nil {
 			return Config{}, fmt.Errorf("dev mode: %w", err)
+		}
+	}
+
+	if cfg.MetricsAddr != "" {
+		if err := checkMetricsAddr(cfg.MetricsAddr); err != nil {
+			return Config{}, err
 		}
 	}
 
@@ -203,4 +231,19 @@ func checkLoopback(addr string) error {
 		return nil
 	}
 	return fmt.Errorf("listen address must be loopback (127.0.0.1, [::1] or localhost), got a non-loopback host")
+}
+
+// checkMetricsAddr accepts only an IP literal that is loopback, with a port.
+// "localhost", an empty host and any other address are refused: the metrics
+// listener has no authentication, so it must not be reachable from outside
+// the host.
+func checkMetricsAddr(addr string) error {
+	host, err := splitHostPort(addr)
+	if err != nil {
+		return fmt.Errorf("%s: %w", EnvMetricsAddr, err)
+	}
+	if ip := net.ParseIP(host); ip == nil || !ip.IsLoopback() {
+		return fmt.Errorf("%s must be a loopback IP literal (127.0.0.1 or ::1) with a port; the metrics listener has no authentication", EnvMetricsAddr)
+	}
+	return nil
 }
