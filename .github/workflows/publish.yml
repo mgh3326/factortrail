@@ -1,0 +1,44 @@
+name: Publish image
+
+# Runs only for a commit that is already on main, never for a pull request.
+# It needs nothing beyond the GitHub token.
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: publish-${{ github.sha }}
+  cancel-in-progress: false
+
+jobs:
+  publish:
+    if: github.ref == 'refs/heads/main'
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      packages: write
+    steps:
+      - name: Check out source
+        uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
+        with:
+          persist-credentials: false
+      - name: Log in to GHCR
+        env:
+          GHCR_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: echo "$GHCR_TOKEN" | docker login ghcr.io --username "${GITHUB_ACTOR}" --password-stdin
+      - name: Build and push the immutable image
+        env:
+          IMAGE: ghcr.io/${{ github.repository_owner }}/factortrail:sha-${{ github.sha }}
+        run: docker buildx build --push --platform linux/amd64 --build-arg REVISION="${GITHUB_SHA}" --tag "$IMAGE" .
+      - name: Surface the pushed digest
+        env:
+          IMAGE: ghcr.io/${{ github.repository_owner }}/factortrail:sha-${{ github.sha }}
+        run: |
+          set -eu
+          digest="$(docker buildx imagetools inspect "$IMAGE" --format '{{.Manifest.Digest}}')"
+          test -n "$digest"
+          printf '%s\n' '### GHCR image' "- image: \`$IMAGE\`" "- digest: \`$digest\`" >> "$GITHUB_STEP_SUMMARY"
