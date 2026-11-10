@@ -23,7 +23,7 @@ import (
 const (
 	synthDSN     = "https://synthetic-public-key@sentry.example.invalid/1234"
 	synthToken   = "SYNTHETIC-READ-TOKEN-7f3a9c"
-	synthJWT     = "eyJhbGciOiJSUzI1NiIsImtpZCI6InN5bnRoIn0.eyJlbWFpbCI6InN5bnRoZXRpY0BleGFtcGxlLnRlc3QifQ.c3ludGhldGljLXNpZw"
+	synthJWT     = "eyJhbGciOiJSUzI1NiIsImtpZCI6InN5bnRoIn0.eyJlbWFpbCI6InN5bnRoZXRpY0BleGFtcGxlLnRlc3QifQ.c3ludGhldGljLXNpZw" // gitleaks:allow synthetic test JWT
 	synthEmail   = "synthetic-operator@example.test"
 	synthPath    = "/run/synthetic-secrets/token-file"
 	synthBase    = "http://synthetic-upstream.example.invalid:8000"

@@ -195,7 +195,7 @@ func TestSentryDSNIsRefusedWithoutEchoingIt(t *testing.T) {
 func TestLogsAreJSONAndCarryNoCredentials(t *testing.T) {
 	const (
 		token = "SYNTHETIC-READ-TOKEN-9d2e"
-		jwt   = "eyJhbGciOiJSUzI1NiJ9.eyJzdWIiOiJzeW50aGV0aWMifQ.c3ludGhldGljLXNpZw"
+		jwt   = "eyJhbGciOiJSUzI1NiJ9.eyJzdWIiOiJzeW50aGV0aWMifQ.c3ludGhldGljLXNpZw" // gitleaks:allow synthetic test JWT
 		email = "synthetic-operator@example.test"
 	)
 	getenv := envMap(accessEnv...)
