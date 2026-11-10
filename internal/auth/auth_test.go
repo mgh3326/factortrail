@@ -1,6 +1,7 @@
 package auth
 
 import (
+	"context"
 	"crypto/rand"
 	"crypto/rsa"
 	"encoding/base64"
@@ -60,10 +61,11 @@ func testKeys(t *testing.T) (a, b, other *rsa.PrivateKey) {
 type jwksTransport struct {
 	t *testing.T
 
-	mu    sync.Mutex
-	keys  map[string]*rsa.PublicKey
-	fail  bool
-	calls int
+	mu        sync.Mutex
+	keys      map[string]*rsa.PublicKey
+	fail      bool
+	calls     int
+	cancelled int // fetches whose request context was already done
 }
 
 func (j *jwksTransport) set(keys map[string]*rsa.PublicKey, fail bool) {
@@ -78,10 +80,20 @@ func (j *jwksTransport) count() int {
 	return j.calls
 }
 
+func (j *jwksTransport) cancelledFetches() int {
+	j.mu.Lock()
+	defer j.mu.Unlock()
+	return j.cancelled
+}
+
 func (j *jwksTransport) RoundTrip(r *http.Request) (*http.Response, error) {
 	j.mu.Lock()
 	defer j.mu.Unlock()
 	j.calls++
+	if r.Context().Err() != nil {
+		j.cancelled++
+		return nil, r.Context().Err()
+	}
 	if r.URL.String() != testCerts {
 		j.t.Errorf("unexpected outbound request to %s", r.URL)
 		return nil, errors.New("unexpected URL")
@@ -569,5 +581,52 @@ func TestNewVerifierRefusesIncompleteConfig(t *testing.T) {
 	}
 	if _, err := NewVerifier(ok); err != nil {
 		t.Fatalf("valid configuration refused: %v", err)
+	}
+}
+
+// A failed refresh for an unknown kid must not take down keys that are still
+// within their TTL: the unknown key is refused, valid assertions are not.
+func TestFailedUnknownKidRefreshKeepsFreshKeys(t *testing.T) {
+	h := newHarness(t)
+	_, b, _ := testKeys(t)
+	if w := h.do(map[string]string{assertionHeader: assertion(t, claims())}); w.Code != http.StatusNoContent {
+		t.Fatalf("warm-up status = %d, want 204", w.Code)
+	}
+	h.jwks.set(nil, true)
+	*h.clock = h.clock.Add(time.Minute) // past the retry interval, inside the TTL
+	unknown := sign(t, jwt.SigningMethodRS256, "kid-never-seen", claims(), b)
+	if w := h.do(map[string]string{assertionHeader: unknown}); w.Code != http.StatusUnauthorized {
+		t.Fatalf("unknown kid status = %d, want 401", w.Code)
+	}
+	c := claims()
+	c["iat"] = h.clock.Add(-time.Minute).Unix()
+	c["nbf"] = h.clock.Add(-time.Minute).Unix()
+	c["exp"] = h.clock.Add(time.Hour).Unix()
+	if w := h.do(map[string]string{assertionHeader: assertion(t, c)}); w.Code != http.StatusNoContent {
+		t.Fatalf("valid assertion after a failed unknown-kid refresh: status = %d, want 204", w.Code)
+	}
+}
+
+// The shared key set is refreshed on its own context: a client that
+// disconnects mid-request cannot make the refresh fail for everyone.
+func TestRefreshIsNotCancelledByTheRequest(t *testing.T) {
+	h := newHarness(t)
+	a, _, _ := testKeys(t)
+	h.do(map[string]string{assertionHeader: assertion(t, claims())})
+	h.jwks.set(map[string]*rsa.PublicKey{"kid-a": &a.PublicKey, "kid-c": &a.PublicKey}, false)
+	*h.clock = h.clock.Add(time.Minute)
+
+	ctx, cancel := context.WithCancel(context.Background())
+	cancel() // the client is already gone
+	r := httptest.NewRequestWithContext(ctx, http.MethodPost, "/mcp", nil)
+	r.Header.Set(assertionHeader, sign(t, jwt.SigningMethodRS256, "kid-c", claims(), a))
+	h.handler.ServeHTTP(httptest.NewRecorder(), r)
+
+	if h.jwks.cancelledFetches() != 0 {
+		t.Fatalf("%d JWKS fetches ran on a cancelled request context", h.jwks.cancelledFetches())
+	}
+	// The refresh completed, so the rotated key is now cached.
+	if w := h.do(map[string]string{assertionHeader: sign(t, jwt.SigningMethodRS256, "kid-c", claims(), a)}); w.Code != http.StatusNoContent {
+		t.Fatalf("rotated kid after a cancelled request: status = %d, want 204", w.Code)
 	}
 }

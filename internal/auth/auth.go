@@ -251,7 +251,7 @@ func (v *Verifier) reject(w http.ResponseWriter, r *http.Request, err error) {
 // keyFor returns the public key for kid from a key set no older than the
 // cache TTL. It fetches a new set when the cached one is stale or does not
 // contain kid, at most once per minRefreshInterval. When a needed fetch is
-// not possible the answer is an error: stale keys are dropped, never reused.
+// not possible the answer is an error: keys past their TTL are never served.
 func (v *Verifier) keyFor(ctx context.Context, kid string) (*rsa.PublicKey, error) {
 	v.mu.Lock()
 	defer v.mu.Unlock()
@@ -266,9 +266,14 @@ func (v *Verifier) keyFor(ctx context.Context, kid string) (*rsa.PublicKey, erro
 		return nil, errors.New("signing key not available")
 	}
 	v.lastAttempt = now
-	keys, err := v.fetch(ctx)
+	// The key set is shared by every request, so its refresh must not depend
+	// on the one request that triggered it: a client that disconnects must
+	// not make the refresh fail for everyone. fetch applies its own timeout.
+	keys, err := v.fetch(context.WithoutCancel(ctx))
 	if err != nil {
-		v.keys = nil
+		// Keys still inside their TTL stay usable: a failed refresh for an
+		// unknown key id refuses that key only. Keys past their TTL are not
+		// served either way, because the freshness check above rejects them.
 		return nil, fmt.Errorf("refresh signing keys: %w", err)
 	}
 	v.keys, v.fetchedAt = keys, now
