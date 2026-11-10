@@ -58,7 +58,7 @@ type echoIn struct {
 
 // testTool returns a table entry whose handler counts its calls.
 func testTool(name string, calls *atomic.Int32) tool {
-	return tool{name: name, register: func(s *gmcp.Server) {
+	return tool{name: name, register: func(s *gmcp.Server, _ Retro) {
 		gmcp.AddTool(s, &gmcp.Tool{Name: name, Description: "test tool"}, func(_ context.Context, _ *gmcp.CallToolRequest, in echoIn) (*gmcp.CallToolResult, any, error) {
 			calls.Add(1)
 			return &gmcp.CallToolResult{Content: []gmcp.Content{&gmcp.TextContent{Text: in.Text}}}, nil, nil
@@ -66,43 +66,26 @@ func testTool(name string, calls *atomic.Int32) tool {
 	}}
 }
 
-func TestRetroProfileHasNoToolsYet(t *testing.T) {
-	p, err := lookupProfile("retro")
-	if err != nil {
-		t.Fatal(err)
-	}
-	if len(p) != 0 {
-		t.Fatalf("retro profile has %d tools, want 0 in the bootstrap change", len(p))
-	}
-	cs := connect(t, newServer("test", p))
-	if got := listNames(t, cs); len(got) != 0 {
-		t.Fatalf("tools/list = %v, want empty", got)
-	}
-	if info := cs.InitializeResult().ServerInfo; info.Name != "Factortrail" {
-		t.Fatalf("server name = %q, want Factortrail", info.Name)
-	}
-}
-
 func TestUnregisteredToolIsRefused(t *testing.T) {
 	p, _ := lookupProfile("retro")
-	cs := connect(t, newServer("test", p))
-	res, err := cs.CallTool(ctxT(t), &gmcp.CallToolParams{Name: "retro_day", Arguments: map[string]any{}})
+	cs := connect(t, newServer("test", p, nil))
+	res, err := cs.CallTool(ctxT(t), &gmcp.CallToolParams{Name: "place_order", Arguments: map[string]any{}})
 	if err == nil {
 		t.Fatalf("call of an unregistered tool succeeded: %+v", res)
 	}
-	if !strings.Contains(err.Error(), "retro_day") {
+	if !strings.Contains(err.Error(), "place_order") {
 		t.Fatalf("error %q does not name the refused tool", err)
 	}
 }
 
 func TestProfileToolsAreServedAndOthersAreNot(t *testing.T) {
 	var inCalls, strayCalls atomic.Int32
-	srv := newServer("test", []tool{testTool("in_profile", &inCalls)})
+	srv := newServer("test", []tool{testTool("in_profile", &inCalls)}, nil)
 
 	// A handler that exists on the server but is not in the profile table,
 	// as if a later change registered it by mistake.
 	strayTool := testTool("stray", &strayCalls)
-	strayTool.register(srv)
+	strayTool.register(srv, nil)
 
 	cs := connect(t, srv)
 	if got := listNames(t, cs); len(got) != 1 || got[0] != "in_profile" {
@@ -162,7 +145,7 @@ func rawPost(t *testing.T, url, host string, headers map[string]string, body str
 
 const listBody = `{"jsonrpc":"2.0","id":1,"method":"tools/list"}`
 
-func TestToolsListOverHTTPIsStatelessAndEmpty(t *testing.T) {
+func TestToolsListOverHTTPIsStatelessAndListsTheProfile(t *testing.T) {
 	h, err := NewHandler(Options{Profile: "retro", Version: "test"})
 	if err != nil {
 		t.Fatal(err)
@@ -185,11 +168,14 @@ func TestToolsListOverHTTPIsStatelessAndEmpty(t *testing.T) {
 	if err := json.Unmarshal([]byte(body), &out); err != nil {
 		t.Fatalf("decode %q: %v", body, err)
 	}
-	if string(out.Result.Tools) != "[]" {
-		t.Fatalf("tools = %s, want []", out.Result.Tools)
+	var tools []struct {
+		Name string `json:"name"`
+	}
+	if err := json.Unmarshal(out.Result.Tools, &tools); err != nil || len(tools) != 8 {
+		t.Fatalf("tools = %s (%v), want the eight retro tools", out.Result.Tools, err)
 	}
 	// A call to a tool that is not registered is a JSON-RPC error, not a result.
-	_, body = rawPost(t, srv.URL, "", nil, `{"jsonrpc":"2.0","id":2,"method":"tools/call","params":{"name":"retro_day","arguments":{}}}`)
+	_, body = rawPost(t, srv.URL, "", nil, `{"jsonrpc":"2.0","id":2,"method":"tools/call","params":{"name":"place_order","arguments":{}}}`)
 	if !strings.Contains(body, `"error"`) || strings.Contains(body, `"result"`) {
 		t.Fatalf("unregistered tool call body = %s, want a JSON-RPC error", body)
 	}

@@ -20,6 +20,8 @@ const (
 	EnvAccessTeamDomain    = "FACTORTRAIL_ACCESS_TEAM_DOMAIN"
 	EnvAccessAUD           = "FACTORTRAIL_ACCESS_AUD"
 	EnvAccessAllowedEmails = "FACTORTRAIL_ACCESS_ALLOWED_EMAILS"
+	EnvRetroBaseURL        = "FACTORTRAIL_RETRO_BASE_URL"
+	EnvRetroTokenFile      = "FACTORTRAIL_RETRO_TOKEN_FILE"
 )
 
 // DefaultAddr is the listen address when none is given: loopback only.
@@ -42,6 +44,14 @@ environment only:
 
 All three Access settings are required unless --dev is given; a partial set
 is always refused.
+
+  ` + EnvRetroBaseURL + `       base URL of the auto_trader retro/v1 API
+  ` + EnvRetroTokenFile + `     path of the file that holds the read token
+
+The two upstream settings go together: both set, or both unset (the retro
+tools then answer that the upstream is not configured). One without the other
+is refused. The token is read from the file once at start and never from
+argv or the environment.
 `
 
 // Access holds the Cloudflare Access settings.
@@ -56,6 +66,17 @@ func (a Access) Configured() bool {
 	return a.TeamDomain != "" && a.AUD != "" && len(a.AllowedEmails) > 0
 }
 
+// Upstream holds the auto_trader retro/v1 settings.
+type Upstream struct {
+	BaseURL   string
+	TokenFile string
+}
+
+// Configured reports whether both settings are present.
+func (u Upstream) Configured() bool {
+	return u.BaseURL != "" && u.TokenFile != ""
+}
+
 // Config is the validated serve configuration.
 type Config struct {
 	// Profile is the requested tool profile name, trimmed. The profile table
@@ -64,8 +85,9 @@ type Config struct {
 	Addr       string
 	PublicHost string
 	// Dev is local-testing mode: loopback bind only, Access optional.
-	Dev    bool
-	Access Access
+	Dev      bool
+	Access   Access
+	Upstream Upstream
 }
 
 // Load parses the arguments after "serve" and the environment, and refuses
@@ -101,6 +123,10 @@ func Load(args []string, getenv func(string) string) (Config, error) {
 			AUD:           strings.TrimSpace(getenv(EnvAccessAUD)),
 			AllowedEmails: splitList(getenv(EnvAccessAllowedEmails)),
 		},
+		Upstream: Upstream{
+			BaseURL:   strings.TrimSpace(getenv(EnvRetroBaseURL)),
+			TokenFile: strings.TrimSpace(getenv(EnvRetroTokenFile)),
+		},
 	}
 	if cfg.Addr == "" {
 		cfg.Addr = DefaultAddr
@@ -113,6 +139,11 @@ func Load(args []string, getenv func(string) string) (Config, error) {
 		if err := checkLoopback(cfg.Addr); err != nil {
 			return Config{}, fmt.Errorf("dev mode: %w", err)
 		}
+	}
+
+	if (cfg.Upstream.BaseURL == "") != (cfg.Upstream.TokenFile == "") {
+		return Config{}, fmt.Errorf("incomplete upstream configuration: set both %s and %s or neither",
+			EnvRetroBaseURL, EnvRetroTokenFile)
 	}
 
 	var missing []string

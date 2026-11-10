@@ -10,22 +10,33 @@ import (
 
 // tool is one row of the static tool table. Adding a tool is one row here
 // plus its handler: register adds the tool to a server with the SDK's typed
-// AddTool, and name must equal the name it registers.
+// AddTool, and name must equal the name it registers. The Retro backend is
+// the tool's upstream; it may be nil, and the handler then answers that the
+// upstream is not configured.
 type tool struct {
 	name     string
-	register func(*gmcp.Server)
+	register func(*gmcp.Server, Retro)
 }
 
 // profiles is the static profile table. A server starts with exactly one of
 // these; there is no dynamic filtering and no default profile.
 //
-// The retro profile is empty in the bootstrap change. The retrospective tools
-// are added as rows of retroTools together with their handlers.
+// The retro profile holds exactly the eight operations of the pinned
+// auto_trader retro/v1 contract; a tool's name is its operationId.
 var profiles = map[string][]tool{
 	"retro": retroTools,
 }
 
-var retroTools = []tool{}
+var retroTools = []tool{
+	{"retro_day", registerRetroDay},
+	{"retro_symbol", registerRetroSymbol},
+	{"retro_funnel", registerRetroFunnel},
+	{"retro_scoreboard", registerRetroScoreboard},
+	{"retro_positions", registerRetroPositions},
+	{"mock_experiments", registerMockExperiments},
+	{"get_bars", registerGetBars},
+	{"data_gaps", registerDataGaps},
+}
 
 // lookupProfile returns the tools of the named profile. The name must match
 // exactly: an empty or unknown name is an error, never a fallback.

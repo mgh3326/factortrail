@@ -23,7 +23,8 @@ that `go build` records is used, and `unknown` when neither exists.
 | `/healthz` | none | `GET` returns `200` with an empty body |
 
 Every other path is `404`. The process binds `127.0.0.1:8820` unless told
-otherwise. It makes no outbound call except the Access key-set (JWKS) fetch,
+otherwise. It makes no outbound call except the Access key-set (JWKS) fetch
+and the calls of the auto_trader provider (see [Retro tools](#retro-tools)),
 and links no database driver, SQL package or broker client. Both rules are
 enforced by tests in `cmd/factortrail/policy_test.go`.
 
@@ -36,7 +37,8 @@ there is no default and no dynamic filtering.
 
 `tools/call` and `tools/list` are checked against the active profile on every
 request, so a handler that exists on the server but is not in the profile is
-neither listed nor callable. The `retro` profile has no tools yet.
+neither listed nor callable. The `retro` profile has exactly the eight tools
+listed under [Retro tools](#retro-tools) and no other.
 
 Adding a tool is one row in the profile's table plus its handler.
 
@@ -52,11 +54,20 @@ A flag overrides its environment variable. Values never live in Git.
 | `FACTORTRAIL_ACCESS_TEAM_DOMAIN` | env only | Access team domain (bare host name) |
 | `FACTORTRAIL_ACCESS_AUD` | env only | Access application audience tag |
 | `FACTORTRAIL_ACCESS_ALLOWED_EMAILS` | env only | comma-separated operator email allowlist |
+| `FACTORTRAIL_RETRO_BASE_URL` | env only | base URL of the auto_trader `retro/v1` API (`http` or `https`, host only, no user info, query or fragment) |
+| `FACTORTRAIL_RETRO_TOKEN_FILE` | env only | path of the file that holds the upstream read token |
 | `--dev` | flag only | local testing mode, see below |
 
-The upstream read token for the `retro/v1` API (`RETRO_API_READ_TOKEN`, read
-from a file path and never from argv) is not read yet. It is added with the
-upstream client and is not required by this build.
+The two upstream settings go together: both set, or both unset. With neither,
+the process starts, the eight retro tools stay listed, and each call answers
+that the upstream is not configured.
+
+The upstream read token (`RETRO_API_READ_TOKEN` on the auto_trader side) is
+read from the file named by `FACTORTRAIL_RETRO_TOKEN_FILE`, once, when the
+process starts. It is never taken from a flag, argv or an environment
+variable, and never baked into the image or a build argument. The file holds
+one token of printable ASCII (a trailing newline is ignored) and is at most
+4 KiB. A token rotation is a new file content plus a restart.
 
 ## Startup refusals
 
@@ -69,7 +80,11 @@ their values, when:
   email address;
 - the profile is empty or unknown;
 - `--dev` is combined with a listen address that is not loopback;
-- `--public-host` is not a bare host name with an optional port.
+- `--public-host` is not a bare host name with an optional port;
+- only one of `FACTORTRAIL_RETRO_BASE_URL` and `FACTORTRAIL_RETRO_TOKEN_FILE`
+  is set, the base URL is not an `http` or `https` URL with a host (or carries
+  user info, a query or a fragment), or the token file cannot be read, is empty,
+  is larger than 4 KiB or does not hold a single printable ASCII token.
 
 ## Authentication
 
@@ -134,10 +149,97 @@ literal. Access settings are optional in dev mode: with none set, `/mcp` is
 unauthenticated and the process logs a warning; with all three set they are
 enforced as in production; a partial set is still refused.
 
+## Retro tools
+
+The `retro` profile serves eight read-only tools. A tool's name is the
+`operationId` of the pinned contract, its inputs are exactly the query
+parameters of that operation (same names, required set, types, bounds, `tf`
+enum and cursor pattern), and it calls that one operation once.
+
+| Tool | Operation |
+| --- | --- |
+| `retro_day` | `GET /trading/api/retro/v1/retro_day` |
+| `retro_symbol` | `GET /trading/api/retro/v1/retro_symbol` |
+| `retro_funnel` | `GET /trading/api/retro/v1/retro_funnel` |
+| `retro_scoreboard` | `GET /trading/api/retro/v1/retro_scoreboard` |
+| `retro_positions` | `GET /trading/api/retro/v1/retro_positions` |
+| `mock_experiments` | `GET /trading/api/retro/v1/mock_experiments` |
+| `get_bars` | `GET /trading/api/retro/v1/get_bars` |
+| `data_gaps` | `GET /trading/api/retro/v1/data_gaps` |
+
+Input schemas are closed: an argument that is not a contract parameter (a
+URL, a path, an operation name) is refused before any upstream request. The
+upstream response is returned as the tool's structured content, and as its
+text content, without change: a decimal string such as `"1.2300"` stays a
+string, an integer above 2^53 is not rounded, a trailing zero in a JSON number
+is kept and `null` stays `null`.
+
+### Provider
+
+`internal/providers/autotrader` is the only package that calls the upstream.
+It does not import the MCP server, so a CI job can run the pinned client
+against another provider. Its client is generated from the pinned contract;
+the hand-written layer around it:
+
+- takes the base URL from configuration only, and sends the token only as the
+  `X-Retro-Read-Token` header, on every call;
+- gives each call a timeout (15 seconds by default) and honours cancellation;
+- does not follow redirects (a `3xx` is a failure and the redirect target never
+  sees the token) and refuses a response body over 4 MiB;
+- maps an upstream failure to a contract error code with the contract's fixed
+  message (`401` to `auth_missing` or `auth_invalid`, `403` to `scope_denied`,
+  `404` to `feature_off`, `422` to `validation_error`, `503` to `timeout`,
+  `upstream_unavailable` or `schema_mismatch`; a transport failure, an
+  oversize body, a redirect or any other status to `upstream_unavailable`; a
+  `200` body that is not one JSON object to `schema_mismatch`). The upstream
+  body is read only to choose among the codes the contract allows for that
+  status and is never copied into an error, a log line or a tool result.
+
+### Pinned contract
+
+auto_trader owns the HTTP contract (`contracts/retro/v1/openapi.yaml` there).
+This repository keeps a pinned copy in `contracts/autotrader/retro/v1/`, with
+its synthetic examples, and `contracts.lock.json` records the source
+repository, source commit, source paths and the sha256 of each file.
+`TestPinnedContractMatchesLock` fails when any pinned file differs from the
+lock, or a file is added to or removed from the examples directory.
+
+The generated client `internal/providers/autotrader/client.gen.go` is
+committed. The `verify` job regenerates it and fails when the result differs
+from the committed file. The generator is `oapi-codegen` v2.8.0, pinned as a
+Go `tool` dependency in `go.mod` and run by the `go:generate` line in
+`internal/providers/autotrader/generate.go`. The generated response models
+do not carry the envelope fields of the spec's `allOf` responses; the provider
+does not use them and returns the raw JSON instead.
+
+### Updating the pinned contract
+
+Do this for every new auto_trader commit this service should follow. It never
+happens by following auto_trader's main branch.
+
+1. In an auto_trader checkout at the new commit `<sha>`, copy
+   `contracts/retro/v1/openapi.yaml` over
+   `contracts/autotrader/retro/v1/openapi.yaml`, and
+   `contracts/retro/v1/examples/*.yaml` into
+   `contracts/autotrader/retro/v1/examples/` (remove files that no longer
+   exist there).
+2. Edit `contracts.lock.json`: set `source_commit` to `<sha>` and refresh the
+   `sha256` of the spec and of every example (`sha256sum <file>`), adding or
+   removing example entries to match.
+3. Run `go generate ./internal/providers/autotrader` and commit the changed
+   `client.gen.go`.
+4. Run `go test ./internal/providers/... ./internal/mcp/... ./cmd/factortrail/...`.
+   A new, renamed or removed operation or parameter fails the profile and
+   input-schema tests until the tools follow the contract.
+
+Only synthetic data may enter the pinned copy. Nothing derived from real
+trades, accounts or symbols belongs in this repository.
+
 ## Release policy
 
-- CI (`.github/workflows/ci.yml`): job `verify` runs gofmt, `go vet`,
-  `go test`, `go test -race`, `go build` and a container build with a smoke
+- CI (`.github/workflows/ci.yml`): job `verify` runs gofmt, `go vet`, a
+  regeneration check of the provider client (`go generate`, then fail on any
+  difference), `go test`, `go test -race`, `go build` and a container build with a smoke
   check of the revision label; job `secrets` runs a secret scan. Both are
   required checks.
 - Image: `ghcr.io/mgh3326/factortrail:sha-<commit>`, built by

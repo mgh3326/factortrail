@@ -14,6 +14,7 @@ import (
 	"net/http/httptest"
 	"os"
 	"os/exec"
+	"path/filepath"
 	"strings"
 	"sync/atomic"
 	"testing"
@@ -25,6 +26,7 @@ import (
 	"github.com/mgh3326/factortrail/internal/auth"
 	"github.com/mgh3326/factortrail/internal/config"
 	"github.com/mgh3326/factortrail/internal/mcp"
+	"github.com/mgh3326/factortrail/internal/providers/autotrader/fake"
 )
 
 // TestMain lets the tests run the real main() in a child process: with
@@ -89,6 +91,10 @@ func TestProcessRefusesToStart(t *testing.T) {
 			config.EnvAccessAUD + "=a", config.EnvAccessAllowedEmails + "=o@example.com",
 		}, []string{"serve", "--profile", "retro"}, "team domain"},
 		{"malformed public host", accessEnv, []string{"serve", "--profile", "retro", "--public-host", "*.example.com"}, "public host"},
+		{"base URL without token file", append([]string{config.EnvRetroBaseURL + "=http://127.0.0.1:8000"}, accessEnv...), []string{"serve", "--profile", "retro"}, config.EnvRetroTokenFile},
+		{"token file without base URL", append([]string{config.EnvRetroTokenFile + "=/run/secrets/retro"}, accessEnv...), []string{"serve", "--profile", "retro"}, config.EnvRetroBaseURL},
+		{"unreadable token file", append([]string{config.EnvRetroBaseURL + "=http://127.0.0.1:8000", config.EnvRetroTokenFile + "=/nonexistent/dir/token"}, accessEnv...), []string{"serve", "--profile", "retro"}, "token file cannot be read"},
+		{"base URL with user info", append([]string{config.EnvRetroBaseURL + "=http://user:pw@127.0.0.1:8000", config.EnvRetroTokenFile + "=/nonexistent/dir/token"}, accessEnv...), []string{"serve", "--profile", "retro"}, "user info"},
 		{"unknown subcommand", nil, []string{"frobnicate"}, "usage"},
 		{"no subcommand", nil, nil, "usage"},
 	}
@@ -101,7 +107,7 @@ func TestProcessRefusesToStart(t *testing.T) {
 			if !strings.Contains(stderr, tt.wantErr) {
 				t.Fatalf("stderr %q does not contain %q", stderr, tt.wantErr)
 			}
-			if strings.Contains(stderr, "aud-tag") || strings.Contains(stderr, "operator@example.com") {
+			if strings.Contains(stderr, "/nonexistent/dir") || strings.Contains(stderr, "pw@") || strings.Contains(stderr, "aud-tag") || strings.Contains(stderr, "operator@example.com") {
 				t.Fatalf("stderr leaks a configured value: %q", stderr)
 			}
 		})
@@ -299,10 +305,10 @@ func TestEndToEndThroughAuth(t *testing.T) {
 	if err != nil {
 		t.Fatal(err)
 	}
-	if len(list.Tools) != 0 {
-		t.Fatalf("tools = %d, want 0", len(list.Tools))
+	if len(list.Tools) != 8 {
+		t.Fatalf("tools = %d, want the 8 retro tools", len(list.Tools))
 	}
-	if _, err := cs.CallTool(ctx, &gmcp.CallToolParams{Name: "retro_day", Arguments: map[string]any{}}); err == nil {
+	if _, err := cs.CallTool(ctx, &gmcp.CallToolParams{Name: "place_order", Arguments: map[string]any{}}); err == nil {
 		t.Fatal("call of an unregistered tool succeeded")
 	}
 	if reached.Load() == 0 {
@@ -329,5 +335,55 @@ func TestEndToEndThroughAuth(t *testing.T) {
 	resp.Body.Close()
 	if resp.StatusCode != http.StatusNotFound {
 		t.Fatalf("GET / = %d, want 404", resp.StatusCode)
+	}
+}
+
+// A dev server with upstream settings serves a retro tool through the whole
+// stack: process entry, handler, provider and a fake upstream.
+func TestServeCallsTheUpstreamWithTheTokenFromTheFile(t *testing.T) {
+	const token = "synthetic-token-0123456789"
+	up := fake.NewServer(t, token)
+	tokenPath := filepath.Join(t.TempDir(), "retro-token")
+	if err := os.WriteFile(tokenPath, []byte(token+"\n"), 0o600); err != nil {
+		t.Fatal(err)
+	}
+	lnCh := make(chan net.Listener, 1)
+	listen := func(addr string) (net.Listener, error) {
+		ln, err := net.Listen("tcp", addr)
+		lnCh <- ln
+		return ln, err
+	}
+	ctx, cancel := context.WithCancel(context.Background())
+	done := make(chan int, 1)
+	var out, errb bytes.Buffer
+	env := envMap(config.EnvRetroBaseURL+"="+up.URL, config.EnvRetroTokenFile+"="+tokenPath)
+	go func() {
+		done <- run(ctx, []string{"serve", "--dev", "--profile", "retro", "--addr", "127.0.0.1:0"}, env, &out, &errb, listen)
+	}()
+	ln := <-lnCh
+
+	body := `{"jsonrpc":"2.0","id":1,"method":"tools/call","params":{"name":"retro_positions","arguments":{"cutoff_date":"2026-01-02"}}}`
+	req, _ := http.NewRequest(http.MethodPost, "http://"+ln.Addr().String()+"/mcp", strings.NewReader(body))
+	req.Header.Set("Content-Type", "application/json")
+	req.Header.Set("Accept", "application/json, text/event-stream")
+	resp, err := http.DefaultClient.Do(req)
+	if err != nil {
+		t.Fatal(err)
+	}
+	got, _ := io.ReadAll(resp.Body)
+	resp.Body.Close()
+	if resp.StatusCode != 200 || !strings.Contains(string(got), `"structuredContent"`) || strings.Contains(string(got), `"isError":true`) {
+		t.Fatalf("status = %d body = %s", resp.StatusCode, got)
+	}
+	reqs := up.Requests()
+	if len(reqs) != 1 || reqs[0].Token != token || reqs[0].Path != "/trading/api/retro/v1/retro_positions" {
+		t.Fatalf("upstream requests = %+v", reqs)
+	}
+	if strings.Contains(errb.String(), token) || strings.Contains(string(got), token) {
+		t.Fatal("the token appears in the logs or in the response")
+	}
+	cancel()
+	if code := <-done; code != 0 {
+		t.Fatalf("exit code = %d stderr = %q", code, errb.String())
 	}
 }
