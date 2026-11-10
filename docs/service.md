@@ -104,8 +104,12 @@ The signing keys come from `https://<team domain>/cdn-cgi/access/certs`,
 fetched with a 3 second timeout, no redirects and a 1 MiB limit, and cached
 for 10 minutes. A fetch happens when the cache is stale or a key id is
 unknown, at most once every 30 seconds, whether or not the last attempt
-succeeded. If the key set cannot be refreshed the request is refused: expired
-keys are dropped and never used again. RSA keys below 2048 bits are ignored.
+succeeded. The refresh runs on its own timeout, not on the request that
+triggered it, so a client that disconnects cannot break it for others. A
+failed refresh refuses the request that needed it (an unknown key id) and
+leaves keys that are still inside their TTL in use. Keys past their TTL are
+never used: if they cannot be refreshed, requests are refused. RSA keys below
+2048 bits are ignored.
 
 ## Host and Origin
 
