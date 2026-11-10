@@ -85,7 +85,14 @@ func (w *statusWriter) Write(b []byte) (int, error) {
 
 func (w *statusWriter) Unwrap() http.ResponseWriter { return w.ResponseWriter }
 
+// Flush commits an implicit 200 in net/http, so the status is recorded as
+// written before the flush goes through. A later panic can then no longer
+// turn into a 500 for a response the client already received.
 func (w *statusWriter) Flush() {
+	if !w.wrote {
+		w.status = http.StatusOK
+		w.wrote = true
+	}
 	if f, ok := w.ResponseWriter.(http.Flusher); ok {
 		f.Flush()
 	}

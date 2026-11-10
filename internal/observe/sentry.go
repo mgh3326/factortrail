@@ -99,14 +99,15 @@ var (
 
 const redacted = "[redacted]"
 
-// sensitiveHeaders are lower-cased request header names that carry a
-// credential or a session.
-var sensitiveHeaders = map[string]bool{
-	"authorization":           true,
-	"cookie":                  true,
-	"set-cookie":              true,
-	"cf-access-jwt-assertion": true,
-	"x-retro-read-token":      true,
+// keptHeaders are the only request headers that may leave the process. The
+// list fails closed: a header that is not named here is dropped, so a client
+// address, proxy chain, user agent or credential cannot reach Sentry by being
+// new or unexpected.
+var keptHeaders = map[string]bool{
+	"accept":               true,
+	"content-length":       true,
+	"content-type":         true,
+	"mcp-protocol-version": true,
 }
 
 // scrubEvent removes what must not leave the process and returns the event.
@@ -123,12 +124,12 @@ func scrubEvent(ev *sentry.Event, literals []string) *sentry.Event {
 		ev.Tags[k] = scrubText(v, literals)
 	}
 	if req := ev.Request; req != nil {
-		// Sentry copies ordinary headers verbatim when SendDefaultPII is off,
-		// so every retained key and value is scrubbed as text, not only the
-		// credential names removed here.
+		// Sentry copies request headers when SendDefaultPII is off. Only the
+		// allowlisted ones are kept, and their keys and values still pass the
+		// text rule.
 		headers := make(map[string]string, len(req.Headers))
 		for name, value := range req.Headers {
-			if sensitiveHeaders[strings.ToLower(name)] {
+			if !keptHeaders[strings.ToLower(name)] {
 				continue
 			}
 			headers[scrubText(name, literals)] = scrubText(value, literals)

@@ -30,6 +30,7 @@ const (
 	synthCookie  = "SYNTHETIC-SESSION-COOKIE-1"
 	synthBearer  = "SYNTHETIC-BEARER-VALUE-2"
 	synthQueryRE = "SYNTHETIC-QUERY-VALUE-3"
+	synthIP      = "203.0.113.7" // TEST-NET-3, documentation address
 )
 
 // recorder is a Sentry transport that keeps what would have been sent.
@@ -86,7 +87,7 @@ func assertClean(t *testing.T, where string, v any) {
 	if err != nil {
 		t.Fatal(err)
 	}
-	for _, secret := range []string{synthToken, synthJWT, synthEmail, synthPath, synthBase, synthCookie, synthBearer, synthQueryRE, "eyJhbGciOiJSUzI1NiIsImtpZCI6InN5bnRoIn0"} {
+	for _, secret := range []string{synthToken, synthJWT, synthEmail, synthPath, synthBase, synthCookie, synthBearer, synthQueryRE, synthIP, "eyJhbGciOiJSUzI1NiIsImtpZCI6InN5bnRoIn0"} {
 		if strings.Contains(string(b), secret) {
 			t.Errorf("%s contains %q", where, secret)
 		}
@@ -129,9 +130,13 @@ func TestEventsLeaveWithoutCredentialsCookiesQueryOrIdentity(t *testing.T) {
 	r.Header.Set("Cf-Access-Jwt-Assertion", synthJWT)
 	r.Header.Set("Cookie", "session="+synthCookie)
 	r.Header.Set("Authorization", "Bearer "+synthBearer)
+	r.Header.Set("Content-Type", "application/json")
+	// Headers outside the diagnostic allowlist must not leave the process,
+	// whatever they carry: a client IP, a proxy chain, an operator identity, a JWT.
 	r.Header.Set("X-Keep", "visible")
-	// Ordinary-looking headers that carry identity or a JWT: their values are
-	// not on the credential list, so they must still be scrubbed.
+	r.Header.Set("Cf-Connecting-Ip", synthIP)
+	r.Header.Set("X-Forwarded-For", synthIP)
+	r.Header.Set("User-Agent", "synthetic-client")
 	r.Header.Set("X-Operator", synthEmail)
 	r.Header.Set("X-Assertion", synthJWT)
 
@@ -147,8 +152,13 @@ func TestEventsLeaveWithoutCredentialsCookiesQueryOrIdentity(t *testing.T) {
 	if ev.Request == nil {
 		t.Fatal("event has no request shape; the scrubbing check would prove nothing")
 	}
-	if _, ok := ev.Request.Headers["X-Keep"]; !ok {
-		t.Errorf("non-sensitive header dropped: %v", ev.Request.Headers)
+	if _, ok := ev.Request.Headers["Content-Type"]; !ok {
+		t.Errorf("allowlisted header dropped: %v", ev.Request.Headers)
+	}
+	for _, unlisted := range []string{"X-Keep", "Cf-Connecting-Ip", "X-Forwarded-For", "User-Agent", "X-Operator", "X-Assertion"} {
+		if _, ok := ev.Request.Headers[unlisted]; ok {
+			t.Errorf("unlisted header %s reached the event", unlisted)
+		}
 	}
 	if !strings.Contains(ev.Message+ev.Exception[0].Value, "[redacted]") {
 		t.Errorf("nothing was redacted in %q", ev.Exception[0].Value)
@@ -297,5 +307,33 @@ func TestUpstreamFailuresAreCountedAndOnlyOperatorFaultsReported(t *testing.T) {
 		if !strings.Contains(body, want) {
 			t.Errorf("metrics output lacks %s", want)
 		}
+	}
+}
+
+func TestFlushedResponseIsCountedAsItsCommittedStatus(t *testing.T) {
+	rec := &recorder{}
+	e := newReporter(t, rec)
+	m := observe.NewMetrics()
+	h := observe.Instrument(http.HandlerFunc(func(w http.ResponseWriter, _ *http.Request) {
+		_, _ = w.Write([]byte("partial"))
+		_ = http.NewResponseController(w).Flush()
+		panic("after the response was committed")
+	}), m, e)
+
+	rr := httptest.NewRecorder()
+	h.ServeHTTP(rr, httptest.NewRequest(http.MethodGet, "/mcp", nil))
+	if rr.Code != http.StatusOK || !rr.Flushed {
+		t.Fatalf("status = %d flushed = %v, want the committed 200", rr.Code, rr.Flushed)
+	}
+	e.Flush(time.Second)
+	if n := len(rec.sent()); n != 1 {
+		t.Fatalf("sent %d events, want the panic", n)
+	}
+	body := scrape(t, m)
+	if !strings.Contains(body, `factortrail_http_requests_total{class="2xx",route="/mcp"} 1`) {
+		t.Errorf("the committed 200 is not counted as 2xx:\n%s", body)
+	}
+	if strings.Contains(body, `class="5xx"`) {
+		t.Errorf("a 5xx is counted for a response that was already 200")
 	}
 }
