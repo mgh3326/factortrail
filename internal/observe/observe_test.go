@@ -130,6 +130,10 @@ func TestEventsLeaveWithoutCredentialsCookiesQueryOrIdentity(t *testing.T) {
 	r.Header.Set("Cookie", "session="+synthCookie)
 	r.Header.Set("Authorization", "Bearer "+synthBearer)
 	r.Header.Set("X-Keep", "visible")
+	// Ordinary-looking headers that carry identity or a JWT: their values are
+	// not on the credential list, so they must still be scrubbed.
+	r.Header.Set("X-Operator", synthEmail)
+	r.Header.Set("X-Assertion", synthJWT)
 
 	e.CaptureError(r, fmt.Errorf("reading %s for %s with %s", synthPath, synthEmail, synthJWT), map[string]string{"route": "/mcp"})
 	e.Flush(time.Second)

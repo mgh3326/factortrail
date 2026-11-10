@@ -300,8 +300,9 @@ Reported events:
 Before an event leaves the process, `BeforeSend` removes:
 
 - the request headers `Authorization`, `Cookie`, `Set-Cookie`,
-  `Cf-Access-Jwt-Assertion` and `X-Retro-Read-Token`, and the request cookies,
-  query string, body and URL;
+  `Cf-Access-Jwt-Assertion` and `X-Retro-Read-Token`; every other header is kept
+  only after its name and value pass the text rule below; and the request
+  environment, cookies, query string, body and URL;
 - the user identity and the server name;
 - breadcrumbs and extra data.
 

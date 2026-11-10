@@ -123,11 +123,19 @@ func scrubEvent(ev *sentry.Event, literals []string) *sentry.Event {
 		ev.Tags[k] = scrubText(v, literals)
 	}
 	if req := ev.Request; req != nil {
-		for name := range req.Headers {
+		// Sentry copies ordinary headers verbatim when SendDefaultPII is off,
+		// so every retained key and value is scrubbed as text, not only the
+		// credential names removed here.
+		headers := make(map[string]string, len(req.Headers))
+		for name, value := range req.Headers {
 			if sensitiveHeaders[strings.ToLower(name)] {
-				delete(req.Headers, name)
+				continue
 			}
+			headers[scrubText(name, literals)] = scrubText(value, literals)
 		}
+		req.Headers = headers
+		// Env (REMOTE_ADDR and similar) is client identity, not needed here.
+		req.Env = nil
 		// The URL is dropped, not trimmed: a path can carry anything a caller
 		// sends, and the route is already a fixed tag on the event.
 		req.URL = ""
