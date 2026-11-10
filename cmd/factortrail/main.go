@@ -22,6 +22,7 @@ import (
 	"github.com/mgh3326/factortrail/internal/auth"
 	"github.com/mgh3326/factortrail/internal/config"
 	"github.com/mgh3326/factortrail/internal/mcp"
+	"github.com/mgh3326/factortrail/internal/providers/autotrader"
 )
 
 // revision is the source revision, set at build time with
@@ -94,7 +95,7 @@ func serve(ctx context.Context, args []string, getenv func(string) string, stdou
 		return 1
 	}
 	log.Info("serve.start", "addr", ln.Addr().String(), "profile", cfg.Profile, "dev", cfg.Dev,
-		"access", cfg.Access.Configured(), "public_host_set", cfg.PublicHost != "", "revision", buildRevision())
+		"access", cfg.Access.Configured(), "upstream", cfg.Upstream.Configured(), "public_host_set", cfg.PublicHost != "", "revision", buildRevision())
 
 	srv := &http.Server{
 		Handler:           handler,
@@ -124,12 +125,23 @@ func serve(ctx context.Context, args []string, getenv func(string) string, stdou
 // newHandler builds the MCP handler and, unless dev mode runs without Access
 // settings, the verifier that guards it.
 func newHandler(cfg config.Config, log *slog.Logger) (http.Handler, error) {
-	mcpHandler, err := mcp.NewHandler(mcp.Options{
+	opts := mcp.Options{
 		Profile:    cfg.Profile,
 		Version:    buildRevision(),
 		PublicHost: cfg.PublicHost,
 		Logger:     log,
-	})
+	}
+	if cfg.Upstream.Configured() {
+		// New reads the token file once; its errors name the setting only.
+		prov, err := autotrader.New(autotrader.Config{BaseURL: cfg.Upstream.BaseURL, TokenFile: cfg.Upstream.TokenFile})
+		if err != nil {
+			return nil, err
+		}
+		opts.Retro = prov
+	} else {
+		log.Warn("retro upstream is not configured; the retro tools answer that it is not")
+	}
+	mcpHandler, err := mcp.NewHandler(opts)
 	if err != nil {
 		return nil, err
 	}

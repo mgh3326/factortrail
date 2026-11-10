@@ -1,0 +1,64 @@
+{
+  "version": 1,
+  "contracts": [
+    {
+      "name": "autotrader-retro-v1",
+      "source_repo": "https://github.com/mgh3326/auto_trader",
+      "source_commit": "6978ed91b109b89ecf71ae58a77077bac15579cd",
+      "source_path": "contracts/retro/v1/openapi.yaml",
+      "path": "contracts/autotrader/retro/v1/openapi.yaml",
+      "sha256": "133879c77ae0858f6790e4f0f377a61b26b829b4c1e2df577048cd49fa9589e9",
+      "examples_source_path": "contracts/retro/v1/examples",
+      "examples": [
+        {
+          "path": "contracts/autotrader/retro/v1/examples/data_gaps.yaml",
+          "sha256": "e578477113cefde203bb268df75f6da28398a73067d56b65abf46a11cbb5e881"
+        },
+        {
+          "path": "contracts/autotrader/retro/v1/examples/empty.yaml",
+          "sha256": "a1418ff522f656abbda5da6fae4bde0e2036b67461a346641d53f8f6b9fc6cc7"
+        },
+        {
+          "path": "contracts/autotrader/retro/v1/examples/error.yaml",
+          "sha256": "aa1a56fd31847beeb2ac3bb784de3f97b32cd64a6b33b0abb27b5aee45cddb19"
+        },
+        {
+          "path": "contracts/autotrader/retro/v1/examples/get_bars.yaml",
+          "sha256": "17e7a8e74ce66260b90608c82804a0ab09922293a4614c8287012936ebc49722"
+        },
+        {
+          "path": "contracts/autotrader/retro/v1/examples/mock_experiments.yaml",
+          "sha256": "022b8abf7fbe6e8347aef9f772fbdc8b630528c66044d78d648b05ef4bbd5505"
+        },
+        {
+          "path": "contracts/autotrader/retro/v1/examples/paginated.yaml",
+          "sha256": "52193ea59d270f41095a6a61e6e121e6e29b9bac20b0a1d08d5ca1fa439c8f5a"
+        },
+        {
+          "path": "contracts/autotrader/retro/v1/examples/retro_day.yaml",
+          "sha256": "2d0db3bb98ef248d38c901c742c23a04f88794904641ae9d538f832d9046e6fd"
+        },
+        {
+          "path": "contracts/autotrader/retro/v1/examples/retro_funnel.yaml",
+          "sha256": "e0c3b8343c4b79f88d1d4db080aff7e1865634f5eb32c6ae0761d85a502950ee"
+        },
+        {
+          "path": "contracts/autotrader/retro/v1/examples/retro_positions.yaml",
+          "sha256": "11c444fa02c79b6944af1bb99a95bd557de5ef155b0b650d34f61ea196c35914"
+        },
+        {
+          "path": "contracts/autotrader/retro/v1/examples/retro_scoreboard.yaml",
+          "sha256": "d6537a63b3a00fde6116d5b532ad72ce633af9406bd59f06069dddb500f1bc6f"
+        },
+        {
+          "path": "contracts/autotrader/retro/v1/examples/retro_symbol.yaml",
+          "sha256": "826d9e839e86ab1ec3f8e81d4787c22446d546d1602cb848d1ff18920a37f5c3"
+        },
+        {
+          "path": "contracts/autotrader/retro/v1/examples/unknown_total.yaml",
+          "sha256": "964528665b4575368711981b8fd1f645f75dc188c6188a91c0ff1059241adc83"
+        }
+      ]
+    }
+  ]
+}

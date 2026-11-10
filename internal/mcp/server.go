@@ -32,7 +32,10 @@ type Options struct {
 	// "tools.example.com") when the server runs behind a reverse proxy on
 	// loopback. Empty keeps the SDK's DNS-rebinding protection on.
 	PublicHost string
-	Logger     *slog.Logger
+	// Retro is the upstream of the retro tools. Nil leaves the tools listed;
+	// each then answers that the upstream is not configured.
+	Retro  Retro
+	Logger *slog.Logger
 }
 
 var publicHostRE = regexp.MustCompile(`^[A-Za-z0-9]([A-Za-z0-9.-]*[A-Za-z0-9])?(:[0-9]{1,5})?$`)
@@ -53,7 +56,7 @@ func NewHandler(o Options) (http.Handler, error) {
 	if o.PublicHost != "" && !publicHostRE.MatchString(o.PublicHost) {
 		return nil, fmt.Errorf("public host %q must be a bare host name with an optional port", o.PublicHost)
 	}
-	srv := newServer(o.Version, tools)
+	srv := newServer(o.Version, tools, o.Retro)
 	var h http.Handler = gmcp.NewStreamableHTTPHandler(func(*http.Request) *gmcp.Server { return srv }, &gmcp.StreamableHTTPOptions{
 		Stateless:                  true,
 		JSONResponse:               true,
@@ -102,14 +105,14 @@ func equalASCIIFold(a, b string) bool {
 // newServer builds a server that serves exactly tools. The receiving
 // middleware repeats the profile check at call time, so a handler that was
 // registered on the server by mistake is neither listed nor callable.
-func newServer(version string, tools []tool) *gmcp.Server {
+func newServer(version string, tools []tool, retro Retro) *gmcp.Server {
 	s := gmcp.NewServer(&gmcp.Implementation{Name: DisplayName, Version: version}, &gmcp.ServerOptions{
-		// Advertise tools even while the table is empty.
+		// Advertise tools even when a profile has none.
 		Capabilities: &gmcp.ServerCapabilities{Tools: &gmcp.ToolCapabilities{}},
 	})
 	allowed := make(map[string]struct{}, len(tools))
 	for _, t := range tools {
-		t.register(s)
+		t.register(s, retro)
 		allowed[t.name] = struct{}{}
 	}
 	s.AddReceivingMiddleware(profileGuard(allowed))

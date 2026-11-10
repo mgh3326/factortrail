@@ -195,3 +195,47 @@ func TestProfileIsPassedThroughUnvalidated(t *testing.T) {
 		t.Fatalf("profile = %q, want empty", cfg.Profile)
 	}
 }
+
+func TestUpstreamSettingsGoTogether(t *testing.T) {
+	both := with(fullAccess, EnvRetroBaseURL, "http://127.0.0.1:8000", EnvRetroTokenFile, "/run/secrets/retro-token")
+	cfg, err := Load([]string{"--profile", "retro"}, env(both))
+	if err != nil {
+		t.Fatal(err)
+	}
+	if !cfg.Upstream.Configured() || cfg.Upstream.BaseURL != "http://127.0.0.1:8000" || cfg.Upstream.TokenFile != "/run/secrets/retro-token" {
+		t.Fatalf("upstream = %+v", cfg.Upstream)
+	}
+
+	cfg, err = Load([]string{"--profile", "retro"}, env(fullAccess))
+	if err != nil {
+		t.Fatalf("neither upstream setting must be accepted: %v", err)
+	}
+	if cfg.Upstream.Configured() {
+		t.Fatalf("upstream = %+v, want unconfigured", cfg.Upstream)
+	}
+}
+
+func TestPartialUpstreamIsRefusedNamingSettingsOnly(t *testing.T) {
+	const baseSecret, fileSecret = "http://secret-host.example:8000", "/secret/path/token"
+	for name, m := range map[string]map[string]string{
+		"base URL without token file": with(fullAccess, EnvRetroBaseURL, baseSecret),
+		"token file without base URL": with(fullAccess, EnvRetroTokenFile, fileSecret),
+		"blank token file":            with(fullAccess, EnvRetroBaseURL, baseSecret, EnvRetroTokenFile, "  "),
+	} {
+		t.Run(name, func(t *testing.T) {
+			for _, args := range [][]string{{"--profile", "retro"}, {"--profile", "retro", "--dev"}} {
+				_, err := Load(args, env(m))
+				if err == nil {
+					t.Fatalf("args %v: partial upstream configuration was accepted", args)
+				}
+				msg := err.Error()
+				if !strings.Contains(msg, EnvRetroBaseURL) || !strings.Contains(msg, EnvRetroTokenFile) {
+					t.Fatalf("error %q does not name both settings", msg)
+				}
+				if strings.Contains(msg, "secret") {
+					t.Fatalf("error leaks a configured value: %q", msg)
+				}
+			}
+		})
+	}
+}

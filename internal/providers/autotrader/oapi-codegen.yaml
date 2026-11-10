@@ -1,0 +1,9 @@
+package: autotrader
+output: client.gen.go
+generate:
+  models: true
+  client: true
+output-options:
+  # The contract names its response schemas RetroDayResponse and so on;
+  # the suffix keeps the generated result wrappers from colliding with them.
+  response-type-suffix: Result
