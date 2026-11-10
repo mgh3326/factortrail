@@ -37,7 +37,10 @@ func (h *instrumented) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 				sw.status = http.StatusInternalServerError
 				http.Error(sw, "internal error", http.StatusInternalServerError)
 			}
-			h.errs.CaptureError(r, fmt.Errorf("panic serving %s: %v", route, rec), map[string]string{"route": route})
+			// The recovered value is not interpolated: it can carry anything the
+			// handler was formatting, and no scrubber recognizes every credential
+			// shape. The type is enough to triage.
+			h.errs.CaptureError(r, fmt.Errorf("panic serving %s: %T", route, rec), map[string]string{"route": route})
 		case sw.status >= 500:
 			h.errs.CaptureError(r, fmt.Errorf("HTTP %d serving %s", sw.status, route), map[string]string{"route": route, "class": statusClass(sw.status)})
 		}

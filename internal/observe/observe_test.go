@@ -163,7 +163,7 @@ func TestPanicIsAnswered500AndReportedWithoutSecrets(t *testing.T) {
 	e := newReporter(t, rec)
 	m := observe.NewMetrics()
 	h := observe.Instrument(http.HandlerFunc(func(http.ResponseWriter, *http.Request) {
-		panic("upstream refused " + synthJWT + " at " + synthPath)
+		panic("upstream refused " + synthJWT + " token " + synthToken + " at " + synthPath)
 	}), m, e)
 
 	rr := httptest.NewRecorder()

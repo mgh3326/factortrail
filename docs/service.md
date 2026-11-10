@@ -291,7 +291,8 @@ does not send default personal data.
 
 Reported events:
 
-- a panic in a request handler (the client gets `500` with no detail);
+- a panic in a request handler, reported with the panic value's type only (the
+  client gets `500` with no detail);
 - a `5xx` response on the main listener, tagged with its fixed route;
 - an upstream failure, tagged with the operation and the contract code, except
   `validation_error` and `feature_off`, which are counted in the metrics but
