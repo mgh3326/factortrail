@@ -22,6 +22,7 @@ import (
 	"github.com/mgh3326/factortrail/internal/auth"
 	"github.com/mgh3326/factortrail/internal/config"
 	"github.com/mgh3326/factortrail/internal/mcp"
+	"github.com/mgh3326/factortrail/internal/observe"
 	"github.com/mgh3326/factortrail/internal/providers/autotrader"
 )
 
@@ -80,11 +81,25 @@ func serve(ctx context.Context, args []string, getenv func(string) string, stdou
 	if err != nil {
 		return refuse(err)
 	}
-	log := slog.New(slog.NewTextHandler(stderr, nil))
-	handler, err := newHandler(cfg, log)
+	// Logs are JSON on stdout. The attributes never carry a header, token,
+	// email or JWT: see the call sites and the tests in this package.
+	log := slog.New(slog.NewJSONHandler(stdout, nil))
+	errs, err := observe.NewErrors(observe.SentryOptions{
+		DSN:         cfg.Sentry.DSN,
+		Environment: cfg.Sentry.Environment,
+		Release:     buildRevision(),
+		Redact:      redactions(cfg),
+	})
 	if err != nil {
 		return refuse(err)
 	}
+	defer errs.Flush(2 * time.Second)
+	metrics := observe.NewMetrics()
+	handler, err := newHandler(cfg, log, metrics, errs)
+	if err != nil {
+		return refuse(err)
+	}
+	handler = observe.Instrument(handler, metrics, errs)
 
 	if listen == nil {
 		listen = func(addr string) (net.Listener, error) { return net.Listen("tcp", addr) }
@@ -94,18 +109,30 @@ func serve(ctx context.Context, args []string, getenv func(string) string, stdou
 		fmt.Fprintf(stderr, "factortrail: listen: %v\n", err)
 		return 1
 	}
-	log.Info("serve.start", "addr", ln.Addr().String(), "profile", cfg.Profile, "dev", cfg.Dev,
-		"access", cfg.Access.Configured(), "upstream", cfg.Upstream.Configured(), "public_host_set", cfg.PublicHost != "", "revision", buildRevision())
-
-	srv := &http.Server{
-		Handler:           handler,
-		ReadHeaderTimeout: 10 * time.Second,
-		ReadTimeout:       30 * time.Second,
-		IdleTimeout:       2 * time.Minute,
-		MaxHeaderBytes:    1 << 16,
+	servers := []*http.Server{newServer(handler)}
+	lns := []net.Listener{ln}
+	var metricsBound string
+	if cfg.MetricsAddr != "" {
+		// The metrics listener is loopback-only (config.Load) and serves
+		// nothing but /metrics; the main listener has no metrics route.
+		mln, err := listen(cfg.MetricsAddr)
+		if err != nil {
+			ln.Close()
+			fmt.Fprintf(stderr, "factortrail: listen metrics: %v\n", err)
+			return 1
+		}
+		servers = append(servers, newServer(metricsRoutes(metrics)))
+		lns = append(lns, mln)
+		metricsBound = mln.Addr().String()
 	}
-	errc := make(chan error, 1)
-	go func() { errc <- srv.Serve(ln) }()
+	log.Info("serve.start", "addr", ln.Addr().String(), "profile", cfg.Profile, "dev", cfg.Dev,
+		"access", cfg.Access.Configured(), "upstream", cfg.Upstream.Configured(), "public_host_set", cfg.PublicHost != "",
+		"metrics_addr", metricsBound, "sentry", cfg.Sentry.DSN != "", "revision", buildRevision())
+
+	errc := make(chan error, len(servers))
+	for i, srv := range servers {
+		go func(srv *http.Server, ln net.Listener) { errc <- srv.Serve(ln) }(srv, lns[i])
+	}
 	select {
 	case err := <-errc:
 		fmt.Fprintf(stderr, "factortrail: serve: %v\n", err)
@@ -114,22 +141,58 @@ func serve(ctx context.Context, args []string, getenv func(string) string, stdou
 	}
 	shutdownCtx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
 	defer cancel()
-	if err := srv.Shutdown(shutdownCtx); err != nil {
-		fmt.Fprintf(stderr, "factortrail: shutdown: %v\n", err)
-		return 1
+	for _, srv := range servers {
+		if err := srv.Shutdown(shutdownCtx); err != nil {
+			fmt.Fprintf(stderr, "factortrail: shutdown: %v\n", err)
+			return 1
+		}
 	}
 	log.Info("serve.stop")
 	return 0
 }
 
+// newServer sets the timeouts shared by both listeners.
+func newServer(h http.Handler) *http.Server {
+	return &http.Server{
+		Handler:           h,
+		ReadHeaderTimeout: 10 * time.Second,
+		ReadTimeout:       30 * time.Second,
+		IdleTimeout:       2 * time.Minute,
+		MaxHeaderBytes:    1 << 16,
+	}
+}
+
+// metricsRoutes is the whole metrics listener: GET /metrics, and 404 for any
+// other path.
+func metricsRoutes(m *observe.Metrics) http.Handler {
+	mux := http.NewServeMux()
+	mux.Handle("GET /metrics", m.Handler())
+	return mux
+}
+
+// redactions lists the configured literals that must not appear in any
+// error report.
+func redactions(cfg config.Config) []string {
+	out := []string{
+		cfg.Upstream.TokenFile,
+		cfg.Upstream.BaseURL,
+		cfg.PublicHost,
+		cfg.Access.TeamDomain,
+		cfg.Access.AUD,
+	}
+	return append(out, cfg.Access.AllowedEmails...)
+}
+
 // newHandler builds the MCP handler and, unless dev mode runs without Access
-// settings, the verifier that guards it.
-func newHandler(cfg config.Config, log *slog.Logger) (http.Handler, error) {
+// settings, the verifier that guards it. Tool calls and upstream calls are
+// counted in m; provider failures are reported to e (nil reports nothing).
+func newHandler(cfg config.Config, log *slog.Logger, m *observe.Metrics, e *observe.Errors) (http.Handler, error) {
 	opts := mcp.Options{
 		Profile:    cfg.Profile,
 		Version:    buildRevision(),
 		PublicHost: cfg.PublicHost,
 		Logger:     log,
+		OnToolCall: m.ObserveTool,
 	}
 	if cfg.Upstream.Configured() {
 		// New reads the token file once; its errors name the setting only.
@@ -137,7 +200,7 @@ func newHandler(cfg config.Config, log *slog.Logger) (http.Handler, error) {
 		if err != nil {
 			return nil, err
 		}
-		opts.Retro = prov
+		opts.Retro = observe.NewObservedUpstream(prov, m, e)
 	} else {
 		log.Warn("retro upstream is not configured; the retro tools answer that it is not")
 	}

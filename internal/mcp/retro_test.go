@@ -440,7 +440,7 @@ func TestUnregisteredToolsAreRefusedWithoutAnUpstreamCall(t *testing.T) {
 
 // Without upstream settings the tools stay listed, and a call says so.
 func TestToolsAnswerWhenTheUpstreamIsNotConfigured(t *testing.T) {
-	cs := connect(t, newServer("test", retroTools, nil))
+	cs := connect(t, newServer("test", retroTools, nil, nil))
 	if got := listNames(t, cs); len(got) != 8 {
 		t.Fatalf("tools/list = %v, want 8 tools", got)
 	}

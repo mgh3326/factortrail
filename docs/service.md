@@ -23,10 +23,12 @@ that `go build` records is used, and `unknown` when neither exists.
 | `/healthz` | none | `GET` returns `200` with an empty body |
 
 Every other path is `404`. The process binds `127.0.0.1:8820` unless told
-otherwise. It makes no outbound call except the Access key-set (JWKS) fetch
-and the calls of the auto_trader provider (see [Retro tools](#retro-tools)),
-and links no database driver, SQL package or broker client. Both rules are
-enforced by tests in `cmd/factortrail/policy_test.go`.
+otherwise. It makes no outbound call except the Access key-set (JWKS) fetch,
+the calls of the auto_trader provider (see [Retro tools](#retro-tools)) and,
+only when a Sentry DSN is set, error reports to that DSN's host (see
+[Observability](#observability)). It links no database driver, SQL package or
+broker client. Both rules are enforced by tests in
+`cmd/factortrail/policy_test.go`.
 
 ## Profiles
 
@@ -56,6 +58,9 @@ A flag overrides its environment variable. Values never live in Git.
 | `FACTORTRAIL_ACCESS_ALLOWED_EMAILS` | env only | comma-separated operator email allowlist |
 | `FACTORTRAIL_RETRO_BASE_URL` | env only | base URL of the auto_trader `retro/v1` API (`http` or `https`, host only, no user info, query or fragment) |
 | `FACTORTRAIL_RETRO_TOKEN_FILE` | env only | path of the file that holds the upstream read token |
+| `FACTORTRAIL_METRICS_ADDR` | env only | optional loopback `IP:PORT` of the metrics listener, see [Observability](#observability) |
+| `FACTORTRAIL_SENTRY_DSN` | env only | optional Sentry DSN; error reporting is off when unset |
+| `FACTORTRAIL_SENTRY_ENVIRONMENT` | env only | optional Sentry environment name |
 | `--dev` | flag only | local testing mode, see below |
 
 The two upstream settings go together: both set, or both unset. With neither,
@@ -84,7 +89,12 @@ their values, when:
 - only one of `FACTORTRAIL_RETRO_BASE_URL` and `FACTORTRAIL_RETRO_TOKEN_FILE`
   is set, the base URL is not an `http` or `https` URL with a host (or carries
   user info, a query or a fragment), or the token file cannot be read, is empty,
-  is larger than 4 KiB or does not hold a single printable ASCII token.
+  is larger than 4 KiB or does not hold a single printable ASCII token;
+- `FACTORTRAIL_METRICS_ADDR` is set but is not an IP literal that is loopback
+  with a port (`localhost`, an empty host, `0.0.0.0` and any non-loopback
+  address are refused);
+- `FACTORTRAIL_SENTRY_DSN` is set but does not parse as a Sentry DSN. The
+  message names the setting, never the value.
 
 ## Authentication
 
@@ -234,6 +244,84 @@ happens by following auto_trader's main branch.
 
 Only synthetic data may enter the pinned copy. Nothing derived from real
 trades, accounts or symbols belongs in this repository.
+
+## Observability
+
+Three outputs, each optional except the logs. None of them carries a request
+header, token, cookie, query string, email address or JWT.
+
+### Logs
+
+Logs are JSON, one object per line, on standard output (`slog` JSON handler).
+Event names and existing fields are kept from the text form: `serve.start`,
+`serve.stop`, `auth.rejected` and the SDK's own lines. `serve.start` adds
+`metrics_addr` (the bound loopback address, empty when the metrics listener is
+off) and `sentry` (whether reporting is on).
+
+### Metrics
+
+With `FACTORTRAIL_METRICS_ADDR=<loopback IP>:<port>` a second listener serves
+`GET /metrics` in Prometheus text format and nothing else. Without it no such
+listener is opened, and `/metrics` on the main listener is `404`. The metrics
+listener has no authentication, so the address must be a loopback IP literal:
+`127.0.0.1` or `::1`, never `localhost`, `0.0.0.0` or an empty host.
+
+| Metric | Labels | Meaning |
+| --- | --- | --- |
+| `factortrail_http_requests_total` | `route`, `class` | requests on the main listener |
+| `factortrail_http_request_duration_seconds` | `route` | time to serve a request |
+| `factortrail_mcp_tool_calls_total` | `tool`, `result` | calls of the profile's tools; `result` is `ok` or `error` |
+| `factortrail_mcp_tool_duration_seconds` | `tool` | time of a tool call |
+| `factortrail_upstream_requests_total` | `operation`, `outcome` | calls to auto_trader; `outcome` is `ok` or the contract error code |
+| `factortrail_upstream_request_duration_seconds` | `operation` | time of an upstream call |
+
+Label values come from fixed sets: `route` is `/mcp`, `/healthz` or `other`;
+`class` is the status class (`2xx`, `4xx`, ...); `tool` and `operation` are the
+eight retro tools or `other`; `outcome` is `ok`, one of the eight contract
+error codes or `other`. No path, token, email or user input is a label. The
+standard Go and process collectors are not registered.
+
+### Error reporting (Sentry)
+
+Reporting is on only when `FACTORTRAIL_SENTRY_DSN` is set. When it is unset,
+no Sentry client is created and nothing is sent, even if the environment
+carries `SENTRY_DSN`. The release is the build revision (the same value
+`factortrail version` prints). Traces are off (sample rate `0`), and the SDK
+does not send default personal data.
+
+Reported events:
+
+- a panic in a request handler (the client gets `500` with no detail);
+- a `5xx` response on the main listener, tagged with its fixed route;
+- an upstream failure, tagged with the operation and the contract code, except
+  `validation_error` and `feature_off`, which are counted in the metrics but
+  not reported.
+
+Before an event leaves the process, `BeforeSend` removes:
+
+- the request headers `Authorization`, `Cookie`, `Set-Cookie`,
+  `Cf-Access-Jwt-Assertion` and `X-Retro-Read-Token`, and the request cookies,
+  query string, body and URL;
+- the user identity and the server name;
+- breadcrumbs and extra data.
+
+It then replaces, in every message, exception value and tag, each JWT, each
+email address and each configured literal (the token file path, the upstream
+base URL, the public host, the Access team domain and audience, and the
+allowlisted emails) with `[redacted]`.
+
+### Privacy rule
+
+Nothing that identifies a person, a host or a credential belongs in this
+repository, in a test fixture or in a log line. Tests use synthetic values
+only, and they assert that those values are absent from the scraped metrics,
+the event JSON and the log output.
+
+### Out of scope for this change
+
+- creating the Sentry project and the DSN (operator);
+- the NCP scrape configuration (prom-agent, alloy) and log collection;
+- deployment (hk 3820).
 
 ## Release policy
 
