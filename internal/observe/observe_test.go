@@ -222,6 +222,7 @@ func TestMetricLabelsStayFixed(t *testing.T) {
 	}
 	m.ObserveTool("retro_day", 3*time.Millisecond, false)
 	m.ObserveTool("retro_day", 3*time.Millisecond, true)
+	m.ObserveTool("retro_trades", 2*time.Millisecond, false)
 	m.ObserveTool(synthToken, time.Millisecond, true)
 
 	body := scrape(t, m)
@@ -232,6 +233,7 @@ func TestMetricLabelsStayFixed(t *testing.T) {
 		`factortrail_http_requests_total{class="4xx",route="other"} 2`,
 		`factortrail_mcp_tool_calls_total{result="ok",tool="retro_day"} 1`,
 		`factortrail_mcp_tool_calls_total{result="error",tool="retro_day"} 1`,
+		`factortrail_mcp_tool_calls_total{result="ok",tool="retro_trades"} 1`,
 		`factortrail_mcp_tool_calls_total{result="error",tool="other"} 1`,
 	} {
 		if !strings.Contains(body, want) {
@@ -266,6 +268,9 @@ func (f fakeUpstream) GetBars(context.Context, *autotrader.GetBarsParams) (autot
 func (f fakeUpstream) DataGaps(context.Context, *autotrader.DataGapsParams) (autotrader.Result, error) {
 	return nil, f.err
 }
+func (f fakeUpstream) RetroTrades(context.Context, *autotrader.RetroTradesParams) (autotrader.Result, error) {
+	return nil, f.err
+}
 
 func TestUpstreamFailuresAreCountedAndOnlyOperatorFaultsReported(t *testing.T) {
 	rec := &recorder{}
@@ -287,6 +292,9 @@ func TestUpstreamFailuresAreCountedAndOnlyOperatorFaultsReported(t *testing.T) {
 	if _, err := u.GetBars(context.Background(), &autotrader.GetBarsParams{}); err != nil {
 		t.Fatalf("success path returned %v", err)
 	}
+	if _, err := u.RetroTrades(context.Background(), &autotrader.RetroTradesParams{}); err != nil {
+		t.Fatalf("retro_trades success path returned %v", err)
+	}
 	e.Flush(time.Second)
 
 	events := rec.sent()
@@ -303,6 +311,7 @@ func TestUpstreamFailuresAreCountedAndOnlyOperatorFaultsReported(t *testing.T) {
 		`factortrail_upstream_requests_total{operation="retro_day",outcome="upstream_unavailable"} 1`,
 		`factortrail_upstream_requests_total{operation="mock_experiments",outcome="validation_error"} 1`,
 		`factortrail_upstream_requests_total{operation="get_bars",outcome="ok"} 1`,
+		`factortrail_upstream_requests_total{operation="retro_trades",outcome="ok"} 1`,
 	} {
 		if !strings.Contains(body, want) {
 			t.Errorf("metrics output lacks %s", want)
