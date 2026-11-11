@@ -17,6 +17,27 @@ import (
 	openapi_types "github.com/oapi-codegen/runtime/types"
 )
 
+// Defines values for BarRowMarket.
+const (
+	BarRowMarketCrypto BarRowMarket = "crypto"
+	BarRowMarketKr     BarRowMarket = "kr"
+	BarRowMarketUs     BarRowMarket = "us"
+)
+
+// Valid indicates whether the value is a known member of the BarRowMarket enum.
+func (e BarRowMarket) Valid() bool {
+	switch e {
+	case BarRowMarketCrypto:
+		return true
+	case BarRowMarketKr:
+		return true
+	case BarRowMarketUs:
+		return true
+	default:
+		return false
+	}
+}
+
 // Defines values for ChainRowStage.
 const (
 	Candidate ChainRowStage = "candidate"
@@ -91,6 +112,7 @@ const (
 	ErrorMessageAuthenticationInvalid  ErrorMessage = "Authentication invalid."
 	ErrorMessageAuthenticationRequired ErrorMessage = "Authentication required."
 	ErrorMessageFeatureUnavailable     ErrorMessage = "Feature unavailable."
+	ErrorMessageInvalidMarketParameter ErrorMessage = "Invalid market parameter."
 	ErrorMessageRequestInvalid         ErrorMessage = "Request invalid."
 	ErrorMessageRequestTimedOut        ErrorMessage = "Request timed out."
 	ErrorMessageSchemaMismatch         ErrorMessage = "Schema mismatch."
@@ -106,6 +128,8 @@ func (e ErrorMessage) Valid() bool {
 	case ErrorMessageAuthenticationRequired:
 		return true
 	case ErrorMessageFeatureUnavailable:
+		return true
+	case ErrorMessageInvalidMarketParameter:
 		return true
 	case ErrorMessageRequestInvalid:
 		return true
@@ -161,6 +185,27 @@ func (e PositionRowLotState) Valid() bool {
 	}
 }
 
+// Defines values for PositionRowMarket.
+const (
+	PositionRowMarketCrypto PositionRowMarket = "crypto"
+	PositionRowMarketKr     PositionRowMarket = "kr"
+	PositionRowMarketUs     PositionRowMarket = "us"
+)
+
+// Valid indicates whether the value is a known member of the PositionRowMarket enum.
+func (e PositionRowMarket) Valid() bool {
+	switch e {
+	case PositionRowMarketCrypto:
+		return true
+	case PositionRowMarketKr:
+		return true
+	case PositionRowMarketUs:
+		return true
+	default:
+		return false
+	}
+}
+
 // Defines values for ScoreRowBasis.
 const (
 	HoldingsOnly  ScoreRowBasis = "holdings_only"
@@ -203,45 +248,117 @@ func (e ScoreRowScope) Valid() bool {
 	}
 }
 
+// Defines values for TradeReviewRowPnlClass.
+const (
+	TradeReviewRowPnlClassMissing       TradeReviewRowPnlClass = "missing"
+	TradeReviewRowPnlClassNotApplicable TradeReviewRowPnlClass = "not_applicable"
+	TradeReviewRowPnlClassRecorded      TradeReviewRowPnlClass = "recorded"
+	TradeReviewRowPnlClassUnknown       TradeReviewRowPnlClass = "unknown"
+)
+
+// Valid indicates whether the value is a known member of the TradeReviewRowPnlClass enum.
+func (e TradeReviewRowPnlClass) Valid() bool {
+	switch e {
+	case TradeReviewRowPnlClassMissing:
+		return true
+	case TradeReviewRowPnlClassNotApplicable:
+		return true
+	case TradeReviewRowPnlClassRecorded:
+		return true
+	case TradeReviewRowPnlClassUnknown:
+		return true
+	default:
+		return false
+	}
+}
+
+// Defines values for TradeRowMarket.
+const (
+	TradeRowMarketCrypto      TradeRowMarket = "crypto"
+	TradeRowMarketKr          TradeRowMarket = "kr"
+	TradeRowMarketLessThannil TradeRowMarket = "<nil>"
+	TradeRowMarketUs          TradeRowMarket = "us"
+)
+
+// Valid indicates whether the value is a known member of the TradeRowMarket enum.
+func (e TradeRowMarket) Valid() bool {
+	switch e {
+	case TradeRowMarketCrypto:
+		return true
+	case TradeRowMarketKr:
+		return true
+	case TradeRowMarketLessThannil:
+		return true
+	case TradeRowMarketUs:
+		return true
+	default:
+		return false
+	}
+}
+
 // Defines values for UnknownReason.
 const (
-	CountUnavailable   UnknownReason = "count_unavailable"
-	FlowsNotConfirmed  UnknownReason = "flows_not_confirmed"
-	IncompleteEvidence UnknownReason = "incomplete_evidence"
-	MissingData        UnknownReason = "missing_data"
-	NotApplicable      UnknownReason = "not_applicable"
-	NotRead            UnknownReason = "not_read"
-	SourceMixed        UnknownReason = "source_mixed"
-	Stale              UnknownReason = "stale"
-	Unavailable        UnknownReason = "unavailable"
-	Unsupported        UnknownReason = "unsupported"
-	UpstreamError      UnknownReason = "upstream_error"
+	UnknownReasonCountUnavailable   UnknownReason = "count_unavailable"
+	UnknownReasonFlowsNotConfirmed  UnknownReason = "flows_not_confirmed"
+	UnknownReasonIncompleteEvidence UnknownReason = "incomplete_evidence"
+	UnknownReasonMissingData        UnknownReason = "missing_data"
+	UnknownReasonNotApplicable      UnknownReason = "not_applicable"
+	UnknownReasonNotRead            UnknownReason = "not_read"
+	UnknownReasonRedacted           UnknownReason = "redacted"
+	UnknownReasonSourceMixed        UnknownReason = "source_mixed"
+	UnknownReasonStale              UnknownReason = "stale"
+	UnknownReasonUnavailable        UnknownReason = "unavailable"
+	UnknownReasonUnsupported        UnknownReason = "unsupported"
+	UnknownReasonUpstreamError      UnknownReason = "upstream_error"
 )
 
 // Valid indicates whether the value is a known member of the UnknownReason enum.
 func (e UnknownReason) Valid() bool {
 	switch e {
-	case CountUnavailable:
+	case UnknownReasonCountUnavailable:
 		return true
-	case FlowsNotConfirmed:
+	case UnknownReasonFlowsNotConfirmed:
 		return true
-	case IncompleteEvidence:
+	case UnknownReasonIncompleteEvidence:
 		return true
-	case MissingData:
+	case UnknownReasonMissingData:
 		return true
-	case NotApplicable:
+	case UnknownReasonNotApplicable:
 		return true
-	case NotRead:
+	case UnknownReasonNotRead:
 		return true
-	case SourceMixed:
+	case UnknownReasonRedacted:
 		return true
-	case Stale:
+	case UnknownReasonSourceMixed:
 		return true
-	case Unavailable:
+	case UnknownReasonStale:
 		return true
-	case Unsupported:
+	case UnknownReasonUnavailable:
 		return true
-	case UpstreamError:
+	case UnknownReasonUnsupported:
+		return true
+	case UnknownReasonUpstreamError:
+		return true
+	default:
+		return false
+	}
+}
+
+// Defines values for GetBarsParamsMarket.
+const (
+	GetBarsParamsMarketCrypto GetBarsParamsMarket = "crypto"
+	GetBarsParamsMarketKr     GetBarsParamsMarket = "kr"
+	GetBarsParamsMarketUs     GetBarsParamsMarket = "us"
+)
+
+// Valid indicates whether the value is a known member of the GetBarsParamsMarket enum.
+func (e GetBarsParamsMarket) Valid() bool {
+	switch e {
+	case GetBarsParamsMarketCrypto:
+		return true
+	case GetBarsParamsMarketKr:
+		return true
+	case GetBarsParamsMarketUs:
 		return true
 	default:
 		return false
@@ -272,6 +389,48 @@ func (e GetBarsParamsTf) Valid() bool {
 	}
 }
 
+// Defines values for RetroSymbolParamsMarket.
+const (
+	RetroSymbolParamsMarketCrypto RetroSymbolParamsMarket = "crypto"
+	RetroSymbolParamsMarketKr     RetroSymbolParamsMarket = "kr"
+	RetroSymbolParamsMarketUs     RetroSymbolParamsMarket = "us"
+)
+
+// Valid indicates whether the value is a known member of the RetroSymbolParamsMarket enum.
+func (e RetroSymbolParamsMarket) Valid() bool {
+	switch e {
+	case RetroSymbolParamsMarketCrypto:
+		return true
+	case RetroSymbolParamsMarketKr:
+		return true
+	case RetroSymbolParamsMarketUs:
+		return true
+	default:
+		return false
+	}
+}
+
+// Defines values for RetroTradesParamsMarket.
+const (
+	RetroTradesParamsMarketCrypto RetroTradesParamsMarket = "crypto"
+	RetroTradesParamsMarketKr     RetroTradesParamsMarket = "kr"
+	RetroTradesParamsMarketUs     RetroTradesParamsMarket = "us"
+)
+
+// Valid indicates whether the value is a known member of the RetroTradesParamsMarket enum.
+func (e RetroTradesParamsMarket) Valid() bool {
+	switch e {
+	case RetroTradesParamsMarketCrypto:
+		return true
+	case RetroTradesParamsMarketKr:
+		return true
+	case RetroTradesParamsMarketUs:
+		return true
+	default:
+		return false
+	}
+}
+
 // BarRow defines model for BarRow.
 type BarRow struct {
 	Adjusted *bool         `json:"adjusted"`
@@ -287,7 +446,10 @@ type BarRow struct {
 	HighPrice *DecimalValue `json:"high_price"`
 
 	// LowPrice Exact decimal string; no float conversion. Unit and currency are given by the containing row.
-	LowPrice      *DecimalValue  `json:"low_price"`
+	LowPrice *DecimalValue `json:"low_price"`
+
+	// Market Market actually read, selected explicitly or inferred from symbol.
+	Market        BarRowMarket   `json:"market"`
 	MissingReason *UnknownReason `json:"missing_reason"`
 
 	// OpenPrice Exact decimal string; no float conversion. Unit and currency are given by the containing row.
@@ -310,6 +472,9 @@ type BarRow struct {
 	Venue *string `json:"venue"`
 }
 
+// BarRowMarket Market actually read, selected explicitly or inferred from symbol.
+type BarRowMarket string
+
 // Benchmark defines model for Benchmark.
 type Benchmark struct {
 	Basis EvidenceBasis `json:"basis"`
@@ -322,7 +487,7 @@ type Benchmark struct {
 	UnknownReason *UnknownReason `json:"unknown_reason"`
 }
 
-// ChainRow defines model for ChainRow.
+// ChainRow Order rows originate from live broker order ledgers, including direct orders. An unambiguous order links to its rung; fills link to their ledger order. Order statuses are filled, partially_filled, working, cancelled, expired, rejected, and unresolved. Authoritative fills take precedence, followed by broker terminal status, then the linked rung expiry inference; a current-day open order is working and an older one without terminal evidence is unresolved. Rejection reasons are rate_limited, price_limit, insufficient_balance, market_closed, invalid_order, or broker_other. Expiry reasons are day_order_expired or expired_inference_no_broker_original; cancellation uses cancelled and unresolved uses no_terminal_evidence.
 type ChainRow struct {
 	Basis EvidenceBasis `json:"basis"`
 
@@ -430,7 +595,7 @@ type ExperimentRow struct {
 	Unit string `json:"unit"`
 }
 
-// FunnelRow defines model for FunnelRow.
+// FunnelRow Order and fill counts use the same ledger orders and fill rows as the chain.
 type FunnelRow struct {
 	Basis EvidenceBasis `json:"basis"`
 
@@ -486,10 +651,16 @@ type PositionRow struct {
 	AveragePrice *DecimalValue `json:"average_price"`
 	Basis        EvidenceBasis `json:"basis"`
 
+	// Broker Broker code, never an account identifier.
+	Broker string `json:"broker"`
+
 	// Currency Code or opaque reference only; no raw exception or broker message.
-	Currency      string              `json:"currency"`
-	LotState      PositionRowLotState `json:"lot_state"`
-	MissingReason *UnknownReason      `json:"missing_reason"`
+	Currency string              `json:"currency"`
+	LotState PositionRowLotState `json:"lot_state"`
+
+	// Market Market derived from the ledger instrument type.
+	Market        PositionRowMarket `json:"market"`
+	MissingReason *UnknownReason    `json:"missing_reason"`
 
 	// PositionRef Code or opaque reference only; no raw exception or broker message.
 	PositionRef string `json:"position_ref"`
@@ -509,6 +680,9 @@ type PositionRow struct {
 
 // PositionRowLotState defines model for PositionRow.LotState.
 type PositionRowLotState string
+
+// PositionRowMarket Market derived from the ledger instrument type.
+type PositionRowMarket string
 
 // RetroDayResponse total counts matching chain events for the requested market and date before pagination, or null with count_unavailable. Page length is never total.
 type RetroDayResponse struct {
@@ -533,6 +707,12 @@ type RetroScoreboardResponse struct {
 // RetroSymbolResponse total counts matching chain and lot events for the symbol and range before pagination, or null with count_unavailable. Page length is never total.
 type RetroSymbolResponse struct {
 	Data []ChainRow `json:"data"`
+}
+
+// RetroTradesResponse defines model for RetroTradesResponse.
+type RetroTradesResponse struct {
+	Data    []TradeRow   `json:"data"`
+	Summary TradeSummary `json:"summary"`
 }
 
 // ScoreRow defines model for ScoreRow.
@@ -579,6 +759,76 @@ type ScoreRowBasis string
 // ScoreRowScope defines model for ScoreRow.Scope.
 type ScoreRowScope string
 
+// TradeReviewRow defines model for TradeReviewRow.
+type TradeReviewRow struct {
+	CreatedAt             *time.Time             `json:"created_at"`
+	FillEvidenceAvailable bool                   `json:"fill_evidence_available"`
+	Lesson                *string                `json:"lesson"`
+	NextStrategy          *string                `json:"next_strategy"`
+	Outcome               *string                `json:"outcome"`
+	PnlClass              TradeReviewRowPnlClass `json:"pnl_class"`
+	PnlStatus             *string                `json:"pnl_status"`
+	Rationale             *string                `json:"rationale"`
+
+	// RealizedPnl Exact decimal string; no float conversion. Unit and currency are given by the containing row.
+	RealizedPnl         *DecimalValue `json:"realized_pnl"`
+	RealizedPnlCurrency *string       `json:"realized_pnl_currency"`
+	ResultSummary       *string       `json:"result_summary"`
+	ReviewRef           *string       `json:"review_ref"`
+	RootCauseClass      *string       `json:"root_cause_class"`
+	TriggerType         *string       `json:"trigger_type"`
+}
+
+// TradeReviewRowPnlClass defines model for TradeReviewRow.PnlClass.
+type TradeReviewRowPnlClass string
+
+// TradeRow defines model for TradeRow.
+type TradeRow struct {
+	Basis    EvidenceBasis `json:"basis"`
+	Currency *string       `json:"currency"`
+	EntryAt  *time.Time    `json:"entry_at"`
+
+	// EntryPrice Exact decimal string; no float conversion. Unit and currency are given by the containing row.
+	EntryPrice *DecimalValue `json:"entry_price"`
+	ExitAt     *time.Time    `json:"exit_at"`
+
+	// ExitPrice Exact decimal string; no float conversion. Unit and currency are given by the containing row.
+	ExitPrice  *DecimalValue   `json:"exit_price"`
+	ExitReason *string         `json:"exit_reason"`
+	Market     *TradeRowMarket `json:"market"`
+
+	// Quantity Exact decimal string; no float conversion. Unit and currency are given by the containing row.
+	Quantity *DecimalValue `json:"quantity"`
+
+	// RealizedAmount Exact decimal string; no float conversion. Unit and currency are given by the containing row.
+	RealizedAmount   *DecimalValue `json:"realized_amount"`
+	RealizedCurrency *string       `json:"realized_currency"`
+
+	// ReturnRate Exact decimal string; no float conversion. Unit and currency are given by the containing row.
+	ReturnRate *DecimalValue    `json:"return_rate"`
+	Reviews    []TradeReviewRow `json:"reviews"`
+	Side       *string          `json:"side"`
+	Strategy   *string          `json:"strategy"`
+	Symbol     *string          `json:"symbol"`
+	TradeRef   *string          `json:"trade_ref"`
+}
+
+// TradeRowMarket defines model for TradeRow.Market.
+type TradeRowMarket string
+
+// TradeSummary defines model for TradeSummary.
+type TradeSummary struct {
+	PnlCoverage *struct {
+		Missing       int `json:"missing"`
+		NotApplicable int `json:"not_applicable"`
+		Recorded      int `json:"recorded"`
+		Unknown       int `json:"unknown"`
+	} `json:"pnl_coverage"`
+	RealizedByCurrency *map[string]*DecimalValue `json:"realized_by_currency"`
+	ReturnRateCount    *int                      `json:"return_rate_count"`
+	TradeCount         *int                      `json:"trade_count"`
+}
+
 // Unknown defines model for Unknown.
 type Unknown struct {
 	// Field Code or opaque reference only; no raw exception or broker message.
@@ -597,13 +847,19 @@ type DataGapsParams struct {
 
 // GetBarsParams defines parameters for GetBars.
 type GetBarsParams struct {
-	Symbol string             `form:"symbol" json:"symbol"`
-	Tf     GetBarsParamsTf    `form:"tf" json:"tf"`
-	From   openapi_types.Date `form:"from" json:"from"`
-	To     openapi_types.Date `form:"to" json:"to"`
-	Limit  *int               `form:"limit,omitempty" json:"limit,omitempty"`
-	Cursor *string            `form:"cursor,omitempty" json:"cursor,omitempty"`
+	Symbol string `form:"symbol" json:"symbol"`
+
+	// Market Explicit market selection; when omitted, inferred from symbol.
+	Market *GetBarsParamsMarket `form:"market,omitempty" json:"market,omitempty"`
+	Tf     GetBarsParamsTf      `form:"tf" json:"tf"`
+	From   openapi_types.Date   `form:"from" json:"from"`
+	To     openapi_types.Date   `form:"to" json:"to"`
+	Limit  *int                 `form:"limit,omitempty" json:"limit,omitempty"`
+	Cursor *string              `form:"cursor,omitempty" json:"cursor,omitempty"`
 }
+
+// GetBarsParamsMarket defines parameters for GetBars.
+type GetBarsParamsMarket string
 
 // GetBarsParamsTf defines parameters for GetBars.
 type GetBarsParamsTf string
@@ -649,12 +905,31 @@ type RetroScoreboardParams struct {
 
 // RetroSymbolParams defines parameters for RetroSymbol.
 type RetroSymbolParams struct {
-	Symbol string             `form:"symbol" json:"symbol"`
-	From   openapi_types.Date `form:"from" json:"from"`
-	To     openapi_types.Date `form:"to" json:"to"`
-	Limit  *int               `form:"limit,omitempty" json:"limit,omitempty"`
-	Cursor *string            `form:"cursor,omitempty" json:"cursor,omitempty"`
+	Symbol string `form:"symbol" json:"symbol"`
+
+	// Market Explicit market selection; when omitted, inferred from symbol.
+	Market *RetroSymbolParamsMarket `form:"market,omitempty" json:"market,omitempty"`
+	From   openapi_types.Date       `form:"from" json:"from"`
+	To     openapi_types.Date       `form:"to" json:"to"`
+	Limit  *int                     `form:"limit,omitempty" json:"limit,omitempty"`
+	Cursor *string                  `form:"cursor,omitempty" json:"cursor,omitempty"`
 }
+
+// RetroSymbolParamsMarket defines parameters for RetroSymbol.
+type RetroSymbolParamsMarket string
+
+// RetroTradesParams defines parameters for RetroTrades.
+type RetroTradesParams struct {
+	From     openapi_types.Date       `form:"from" json:"from"`
+	To       openapi_types.Date       `form:"to" json:"to"`
+	Market   *RetroTradesParamsMarket `form:"market,omitempty" json:"market,omitempty"`
+	Strategy *string                  `form:"strategy,omitempty" json:"strategy,omitempty"`
+	Limit    *int                     `form:"limit,omitempty" json:"limit,omitempty"`
+	Cursor   *string                  `form:"cursor,omitempty" json:"cursor,omitempty"`
+}
+
+// RetroTradesParamsMarket defines parameters for RetroTrades.
+type RetroTradesParamsMarket string
 
 // RequestEditorFn is the function signature for the RequestEditor callback function
 type RequestEditorFn func(ctx context.Context, req *http.Request) error
@@ -769,6 +1044,11 @@ type ClientInterface interface {
 	//
 	// Maximum date span: 366 days inclusive. Count and rows share one read-only snapshot.
 	RetroSymbol(ctx context.Context, params *RetroSymbolParams, reqEditors ...RequestEditorFn) (*http.Response, error)
+
+	// RetroTrades performs a GET /trading/api/retro/v1/retro_trades (the `RetroTrades` operationId) request.
+	//
+	// Closed live journals (account_type=live) and linked live reviews (account_mode=kis_live, toss_live, upbit_live). Dates are KST, inclusive, at most 366 days. return_rate is pnl_pct in percent. entry_at is journal creation time. Journal realized P&L prefers total_pnl_krw, then security_pnl_usd, then security_pnl_krw. Values are session-recorded inference.
+	RetroTrades(ctx context.Context, params *RetroTradesParams, reqEditors ...RequestEditorFn) (*http.Response, error)
 }
 
 // DataGaps performs a GET /trading/api/retro/v1/data_gaps (the `DataGaps` operationId) request.
@@ -891,6 +1171,21 @@ func (c *Client) RetroSymbol(ctx context.Context, params *RetroSymbolParams, req
 	return c.Client.Do(req)
 }
 
+// RetroTrades performs a GET /trading/api/retro/v1/retro_trades (the `RetroTrades` operationId) request.
+//
+// Closed live journals (account_type=live) and linked live reviews (account_mode=kis_live, toss_live, upbit_live). Dates are KST, inclusive, at most 366 days. return_rate is pnl_pct in percent. entry_at is journal creation time. Journal realized P&L prefers total_pnl_krw, then security_pnl_usd, then security_pnl_krw. Values are session-recorded inference.
+func (c *Client) RetroTrades(ctx context.Context, params *RetroTradesParams, reqEditors ...RequestEditorFn) (*http.Response, error) {
+	req, err := NewRetroTradesRequest(c.Server, params)
+	if err != nil {
+		return nil, err
+	}
+	req = req.WithContext(ctx)
+	if err := c.applyEditors(ctx, req, reqEditors); err != nil {
+		return nil, err
+	}
+	return c.Client.Do(req)
+}
+
 // NewDataGapsRequest constructs an http.Request for the DataGaps method
 func NewDataGapsRequest(server string, params *DataGapsParams) (*http.Request, error) {
 	var err error
@@ -991,6 +1286,18 @@ func NewGetBarsRequest(server string, params *GetBarsParams) (*http.Request, err
 			for _, qp := range strings.Split(queryFrag, "&") {
 				rawQueryFragments = append(rawQueryFragments, qp)
 			}
+		}
+
+		if params.Market != nil {
+
+			if queryFrag, err := runtime.StyleParamWithOptions("form", true, "market", *params.Market, runtime.StyleParamOptions{ParamLocation: runtime.ParamLocationQuery, Type: "string", Format: ""}); err != nil {
+				return nil, err
+			} else {
+				for _, qp := range strings.Split(queryFrag, "&") {
+					rawQueryFragments = append(rawQueryFragments, qp)
+				}
+			}
+
 		}
 
 		if queryFrag, err := runtime.StyleParamWithOptions("form", true, "tf", params.Tf, runtime.StyleParamOptions{ParamLocation: runtime.ParamLocationQuery, Type: "string", Format: ""}); err != nil {
@@ -1497,6 +1804,18 @@ func NewRetroSymbolRequest(server string, params *RetroSymbolParams) (*http.Requ
 			}
 		}
 
+		if params.Market != nil {
+
+			if queryFrag, err := runtime.StyleParamWithOptions("form", true, "market", *params.Market, runtime.StyleParamOptions{ParamLocation: runtime.ParamLocationQuery, Type: "string", Format: ""}); err != nil {
+				return nil, err
+			} else {
+				for _, qp := range strings.Split(queryFrag, "&") {
+					rawQueryFragments = append(rawQueryFragments, qp)
+				}
+			}
+
+		}
+
 		if queryFrag, err := runtime.StyleParamWithOptions("form", true, "from", params.From, runtime.StyleParamOptions{ParamLocation: runtime.ParamLocationQuery, Type: "string", Format: "date"}); err != nil {
 			return nil, err
 		} else {
@@ -1511,6 +1830,112 @@ func NewRetroSymbolRequest(server string, params *RetroSymbolParams) (*http.Requ
 			for _, qp := range strings.Split(queryFrag, "&") {
 				rawQueryFragments = append(rawQueryFragments, qp)
 			}
+		}
+
+		if params.Limit != nil {
+
+			if queryFrag, err := runtime.StyleParamWithOptions("form", true, "limit", *params.Limit, runtime.StyleParamOptions{ParamLocation: runtime.ParamLocationQuery, Type: "integer", Format: ""}); err != nil {
+				return nil, err
+			} else {
+				for _, qp := range strings.Split(queryFrag, "&") {
+					rawQueryFragments = append(rawQueryFragments, qp)
+				}
+			}
+
+		}
+
+		if params.Cursor != nil {
+
+			if queryFrag, err := runtime.StyleParamWithOptions("form", true, "cursor", *params.Cursor, runtime.StyleParamOptions{ParamLocation: runtime.ParamLocationQuery, Type: "string", Format: ""}); err != nil {
+				return nil, err
+			} else {
+				for _, qp := range strings.Split(queryFrag, "&") {
+					rawQueryFragments = append(rawQueryFragments, qp)
+				}
+			}
+
+		}
+
+		if encoded := queryValues.Encode(); encoded != "" {
+			rawQueryFragments = append(rawQueryFragments, encoded)
+		}
+		queryURL.RawQuery = strings.Join(rawQueryFragments, "&")
+	}
+
+	req, err := http.NewRequest(http.MethodGet, queryURL.String(), nil)
+	if err != nil {
+		return nil, err
+	}
+
+	return req, nil
+}
+
+// NewRetroTradesRequest constructs an http.Request for the RetroTrades method
+func NewRetroTradesRequest(server string, params *RetroTradesParams) (*http.Request, error) {
+	var err error
+
+	serverURL, err := url.Parse(server)
+	if err != nil {
+		return nil, err
+	}
+
+	operationPath := fmt.Sprintf("/trading/api/retro/v1/retro_trades")
+	if operationPath[0] == '/' {
+		operationPath = "." + operationPath
+	}
+
+	queryURL, err := serverURL.Parse(operationPath)
+	if err != nil {
+		return nil, err
+	}
+
+	if params != nil {
+		// queryValues collects non-styled parameters (passthrough, JSON)
+		// that are safe to round-trip through url.Values.Encode().
+		queryValues := queryURL.Query()
+		// rawQueryFragments collects pre-encoded query fragments from
+		// styled parameters, preserving literal commas as delimiters
+		// per the OpenAPI spec (e.g. "color=blue,black,brown").
+		var rawQueryFragments []string
+
+		if queryFrag, err := runtime.StyleParamWithOptions("form", true, "from", params.From, runtime.StyleParamOptions{ParamLocation: runtime.ParamLocationQuery, Type: "string", Format: "date"}); err != nil {
+			return nil, err
+		} else {
+			for _, qp := range strings.Split(queryFrag, "&") {
+				rawQueryFragments = append(rawQueryFragments, qp)
+			}
+		}
+
+		if queryFrag, err := runtime.StyleParamWithOptions("form", true, "to", params.To, runtime.StyleParamOptions{ParamLocation: runtime.ParamLocationQuery, Type: "string", Format: "date"}); err != nil {
+			return nil, err
+		} else {
+			for _, qp := range strings.Split(queryFrag, "&") {
+				rawQueryFragments = append(rawQueryFragments, qp)
+			}
+		}
+
+		if params.Market != nil {
+
+			if queryFrag, err := runtime.StyleParamWithOptions("form", true, "market", *params.Market, runtime.StyleParamOptions{ParamLocation: runtime.ParamLocationQuery, Type: "string", Format: ""}); err != nil {
+				return nil, err
+			} else {
+				for _, qp := range strings.Split(queryFrag, "&") {
+					rawQueryFragments = append(rawQueryFragments, qp)
+				}
+			}
+
+		}
+
+		if params.Strategy != nil {
+
+			if queryFrag, err := runtime.StyleParamWithOptions("form", true, "strategy", *params.Strategy, runtime.StyleParamOptions{ParamLocation: runtime.ParamLocationQuery, Type: "string", Format: ""}); err != nil {
+				return nil, err
+			} else {
+				for _, qp := range strings.Split(queryFrag, "&") {
+					rawQueryFragments = append(rawQueryFragments, qp)
+				}
+			}
+
 		}
 
 		if params.Limit != nil {
@@ -1650,6 +2075,13 @@ type ClientWithResponsesInterface interface {
 	//
 	// Returns a wrapper object for the known response body format(s).
 	RetroSymbolWithResponse(ctx context.Context, params *RetroSymbolParams, reqEditors ...RequestEditorFn) (*RetroSymbolResult, error)
+
+	// RetroTradesWithResponse performs a GET /trading/api/retro/v1/retro_trades (the `RetroTrades` operationId) request.
+	//
+	// Closed live journals (account_type=live) and linked live reviews (account_mode=kis_live, toss_live, upbit_live). Dates are KST, inclusive, at most 366 days. return_rate is pnl_pct in percent. entry_at is journal creation time. Journal realized P&L prefers total_pnl_krw, then security_pnl_usd, then security_pnl_krw. Values are session-recorded inference.
+	//
+	// Returns a wrapper object for the known response body format(s).
+	RetroTradesWithResponse(ctx context.Context, params *RetroTradesParams, reqEditors ...RequestEditorFn) (*RetroTradesResult, error)
 }
 
 type DataGapsResult struct {
@@ -2260,6 +2692,82 @@ func (r RetroSymbolResult) ContentType() string {
 	return ""
 }
 
+type RetroTradesResult struct {
+	Body         []byte
+	HTTPResponse *http.Response
+	// JSON200 the response for an HTTP 200 `application/json` response
+	JSON200 *RetroTradesResponse
+	// JSON401 the response for an HTTP 401 `application/json` response
+	JSON401 *Error
+	// JSON403 the response for an HTTP 403 `application/json` response
+	JSON403 *Error
+	// JSON404 the response for an HTTP 404 `application/json` response
+	JSON404 *Error
+	// JSON422 the response for an HTTP 422 `application/json` response
+	JSON422 *Error
+	// JSON503 the response for an HTTP 503 `application/json` response
+	JSON503 *Error
+}
+
+// GetJSON200 returns the response for an HTTP 200 `application/json` response
+func (r RetroTradesResult) GetJSON200() *RetroTradesResponse {
+	return r.JSON200
+}
+
+// GetJSON401 returns the response for an HTTP 401 `application/json` response
+func (r RetroTradesResult) GetJSON401() *Error {
+	return r.JSON401
+}
+
+// GetJSON403 returns the response for an HTTP 403 `application/json` response
+func (r RetroTradesResult) GetJSON403() *Error {
+	return r.JSON403
+}
+
+// GetJSON404 returns the response for an HTTP 404 `application/json` response
+func (r RetroTradesResult) GetJSON404() *Error {
+	return r.JSON404
+}
+
+// GetJSON422 returns the response for an HTTP 422 `application/json` response
+func (r RetroTradesResult) GetJSON422() *Error {
+	return r.JSON422
+}
+
+// GetJSON503 returns the response for an HTTP 503 `application/json` response
+func (r RetroTradesResult) GetJSON503() *Error {
+	return r.JSON503
+}
+
+// GetBody returns the raw response body bytes
+func (r RetroTradesResult) GetBody() []byte {
+	return r.Body
+}
+
+// Status returns HTTPResponse.Status
+func (r RetroTradesResult) Status() string {
+	if r.HTTPResponse != nil {
+		return r.HTTPResponse.Status
+	}
+	return http.StatusText(0)
+}
+
+// StatusCode returns HTTPResponse.StatusCode
+func (r RetroTradesResult) StatusCode() int {
+	if r.HTTPResponse != nil {
+		return r.HTTPResponse.StatusCode
+	}
+	return 0
+}
+
+// ContentType is a convenience method to retrieve the Content-Type value from the HTTP response headers
+func (r RetroTradesResult) ContentType() string {
+	if r.HTTPResponse != nil {
+		return r.HTTPResponse.Header.Get("Content-Type")
+	}
+	return ""
+}
+
 // DataGapsWithResponse performs a GET /trading/api/retro/v1/data_gaps (the `DataGaps` operationId) request.
 //
 // Count and rows share one read-only snapshot.
@@ -2362,6 +2870,19 @@ func (c *ClientWithResponses) RetroSymbolWithResponse(ctx context.Context, param
 		return nil, err
 	}
 	return ParseRetroSymbolResult(rsp)
+}
+
+// RetroTradesWithResponse performs a GET /trading/api/retro/v1/retro_trades (the `RetroTrades` operationId) request.
+//
+// Closed live journals (account_type=live) and linked live reviews (account_mode=kis_live, toss_live, upbit_live). Dates are KST, inclusive, at most 366 days. return_rate is pnl_pct in percent. entry_at is journal creation time. Journal realized P&L prefers total_pnl_krw, then security_pnl_usd, then security_pnl_krw. Values are session-recorded inference.
+//
+// Returns a wrapper object for the known response body format(s).
+func (c *ClientWithResponses) RetroTradesWithResponse(ctx context.Context, params *RetroTradesParams, reqEditors ...RequestEditorFn) (*RetroTradesResult, error) {
+	rsp, err := c.RetroTrades(ctx, params, reqEditors...)
+	if err != nil {
+		return nil, err
+	}
+	return ParseRetroTradesResult(rsp)
 }
 
 // ParseDataGapsResult parses an HTTP response from a DataGapsWithResponse call
@@ -2807,6 +3328,67 @@ func ParseRetroSymbolResult(rsp *http.Response) (*RetroSymbolResult, error) {
 	switch {
 	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 200:
 		var dest RetroSymbolResponse
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.JSON200 = &dest
+
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 401:
+		var dest Error
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.JSON401 = &dest
+
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 403:
+		var dest Error
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.JSON403 = &dest
+
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 404:
+		var dest Error
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.JSON404 = &dest
+
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 422:
+		var dest Error
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.JSON422 = &dest
+
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 503:
+		var dest Error
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.JSON503 = &dest
+
+	}
+
+	return response, nil
+}
+
+// ParseRetroTradesResult parses an HTTP response from a RetroTradesWithResponse call
+func ParseRetroTradesResult(rsp *http.Response) (*RetroTradesResult, error) {
+	bodyBytes, err := io.ReadAll(rsp.Body)
+	defer func() { _ = rsp.Body.Close() }()
+	if err != nil {
+		return nil, err
+	}
+
+	response := &RetroTradesResult{
+		Body:         bodyBytes,
+		HTTPResponse: rsp,
+	}
+
+	switch {
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 200:
+		var dest RetroTradesResponse
 		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
 			return nil, err
 		}

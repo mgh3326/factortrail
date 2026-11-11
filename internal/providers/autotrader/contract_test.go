@@ -103,7 +103,7 @@ func TestPinnedContractMatchesLock(t *testing.T) {
 	}
 }
 
-// The pinned spec defines the eight operations, GET only, authenticated by
+// The pinned spec defines the nine operations, GET only, authenticated by
 // the one header the provider sends.
 func TestPinnedContractShape(t *testing.T) {
 	c := loadLock(t)

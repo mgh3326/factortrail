@@ -7,7 +7,7 @@
 //
 // What the layer guarantees:
 //
-//   - The base URL comes from Config only. A call chooses one of eight fixed
+//   - The base URL comes from Config only. A call chooses one of nine fixed
 //     operations through a typed method; no argument is a URL, path or
 //     operation name.
 //   - The read token is read once from a file and sent only as the
@@ -292,7 +292,7 @@ func decodeObject(body []byte) (Result, error) {
 	return res, nil
 }
 
-// The eight operations. Each calls its one fixed generated method exactly
+// The nine operations. Each calls its one fixed generated method exactly
 // once.
 
 func (p *Provider) RetroDay(ctx context.Context, q *RetroDayParams) (Result, error) {
@@ -325,4 +325,8 @@ func (p *Provider) GetBars(ctx context.Context, q *GetBarsParams) (Result, error
 
 func (p *Provider) DataGaps(ctx context.Context, q *DataGapsParams) (Result, error) {
 	return p.call(ctx, func(ctx context.Context) (*http.Response, error) { return p.client.DataGaps(ctx, q) })
+}
+
+func (p *Provider) RetroTrades(ctx context.Context, q *RetroTradesParams) (Result, error) {
+	return p.call(ctx, func(ctx context.Context) (*http.Response, error) { return p.client.RetroTrades(ctx, q) })
 }

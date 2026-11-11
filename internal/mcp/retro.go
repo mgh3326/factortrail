@@ -26,6 +26,7 @@ type Retro interface {
 	MockExperiments(context.Context, *autotrader.MockExperimentsParams) (autotrader.Result, error)
 	GetBars(context.Context, *autotrader.GetBarsParams) (autotrader.Result, error)
 	DataGaps(context.Context, *autotrader.DataGapsParams) (autotrader.Result, error)
+	RetroTrades(context.Context, *autotrader.RetroTradesParams) (autotrader.Result, error)
 }
 
 // errNoUpstream is what a retro tool answers when the process started without
@@ -45,6 +46,7 @@ type retroDayIn struct {
 
 type retroSymbolIn struct {
 	Symbol string  `json:"symbol"`
+	Market string  `json:"market"`
 	From   string  `json:"from"`
 	To     string  `json:"to"`
 	Limit  *int    `json:"limit,omitempty"`
@@ -80,11 +82,21 @@ type mockExperimentsIn struct {
 
 type getBarsIn struct {
 	Symbol string  `json:"symbol"`
+	Market string  `json:"market"`
 	Tf     string  `json:"tf"`
 	From   string  `json:"from"`
 	To     string  `json:"to"`
 	Limit  *int    `json:"limit,omitempty"`
 	Cursor *string `json:"cursor,omitempty"`
+}
+
+type retroTradesIn struct {
+	From     string  `json:"from"`
+	To       string  `json:"to"`
+	Market   *string `json:"market,omitempty"`
+	Strategy *string `json:"strategy,omitempty"`
+	Limit    *int    `json:"limit,omitempty"`
+	Cursor   *string `json:"cursor,omitempty"`
 }
 
 type dataGapsIn struct {
@@ -160,7 +172,7 @@ const retroNote = " Read-only. Unknown values stay null with a reason; they are 
 
 func registerRetroDay(s *gmcp.Server, b Retro) {
 	addRetroTool(s, b, "retro_day",
-		"One trading day's chain from candidate to order, fill and holding for a market."+retroNote,
+		"One trading day's chain from candidate to order, fill and holding for a market. Order status and reason use the contract's closed vocabulary."+retroNote,
 		objectSchema([]string{"market", "date"}, map[string]*jsonschema.Schema{
 			"market": strProp("Market code."),
 			"date":   dateProp("Trading date, YYYY-MM-DD."),
@@ -176,9 +188,10 @@ func registerRetroDay(s *gmcp.Server, b Retro) {
 
 func registerRetroSymbol(s *gmcp.Server, b Retro) {
 	addRetroTool(s, b, "retro_symbol",
-		"One symbol's entries, adds, partial sells and holdings over a date range of at most 366 days."+retroNote,
-		objectSchema([]string{"symbol", "from", "to"}, map[string]*jsonschema.Schema{
+		"One symbol's entries, adds, partial sells and holdings over a date range of at most 366 days. Order status and reason use the contract's closed vocabulary."+retroNote,
+		objectSchema([]string{"symbol", "market", "from", "to"}, map[string]*jsonschema.Schema{
 			"symbol": strProp("Symbol."),
+			"market": marketProp(),
 			"from":   dateProp("First date, YYYY-MM-DD."),
 			"to":     dateProp("Last date, YYYY-MM-DD, inclusive."),
 		}),
@@ -191,7 +204,8 @@ func registerRetroSymbol(s *gmcp.Server, b Retro) {
 			if err != nil {
 				return nil, err
 			}
-			return b.RetroSymbol(ctx, &autotrader.RetroSymbolParams{Symbol: in.Symbol, From: from, To: to, Limit: in.Limit, Cursor: in.Cursor})
+			market := autotrader.RetroSymbolParamsMarket(in.Market)
+			return b.RetroSymbol(ctx, &autotrader.RetroSymbolParams{Symbol: in.Symbol, Market: &market, From: from, To: to, Limit: in.Limit, Cursor: in.Cursor})
 		})
 }
 
@@ -238,7 +252,7 @@ func registerRetroScoreboard(s *gmcp.Server, b Retro) {
 
 func registerRetroPositions(s *gmcp.Server, b Retro) {
 	addRetroTool(s, b, "retro_positions",
-		"Positions held at a cutoff date, with cost basis and lot state."+retroNote,
+		"Positions held at a cutoff date, with cost basis and lot state. Each row includes market and broker codes."+retroNote,
 		objectSchema([]string{"cutoff_date"}, map[string]*jsonschema.Schema{
 			"cutoff_date": dateProp("Cutoff date, YYYY-MM-DD."),
 		}),
@@ -267,8 +281,9 @@ func registerGetBars(s *gmcp.Server, b Retro) {
 	tf.Enum = []any{"1m", "5m", "60m", "1d"}
 	addRetroTool(s, b, "get_bars",
 		"Price bars for a symbol over a date range of at most 366 days, with source, venue and adjustment basis."+retroNote,
-		objectSchema([]string{"symbol", "tf", "from", "to"}, map[string]*jsonschema.Schema{
+		objectSchema([]string{"symbol", "market", "tf", "from", "to"}, map[string]*jsonschema.Schema{
 			"symbol": strProp("Symbol."),
+			"market": marketProp(),
 			"tf":     tf,
 			"from":   dateProp("First date, YYYY-MM-DD."),
 			"to":     dateProp("Last date, YYYY-MM-DD, inclusive."),
@@ -282,9 +297,45 @@ func registerGetBars(s *gmcp.Server, b Retro) {
 			if err != nil {
 				return nil, err
 			}
-			return b.GetBars(ctx, &autotrader.GetBarsParams{Symbol: in.Symbol, Tf: autotrader.GetBarsParamsTf(in.Tf), From: from, To: to, Limit: in.Limit, Cursor: in.Cursor})
+			market := autotrader.GetBarsParamsMarket(in.Market)
+			return b.GetBars(ctx, &autotrader.GetBarsParams{Symbol: in.Symbol, Market: &market, Tf: autotrader.GetBarsParamsTf(in.Tf), From: from, To: to, Limit: in.Limit, Cursor: in.Cursor})
 		})
 }
+
+func marketProp() *jsonschema.Schema {
+	s := strProp("Market code.")
+	s.Enum = []any{"kr", "us", "crypto"}
+	return s
+}
+
+func registerRetroTrades(s *gmcp.Server, b Retro) {
+	addRetroTool(s, b, "retro_trades",
+		"Closed live trades over an inclusive date range of at most 366 days; return_rate is pnl_pct in percent."+retroNote,
+		objectSchema([]string{"from", "to"}, map[string]*jsonschema.Schema{
+			"from":     dateProp("First date, YYYY-MM-DD."),
+			"to":       dateProp("Last date, YYYY-MM-DD, inclusive."),
+			"market":   marketProp(),
+			"strategy": &jsonschema.Schema{Type: "string", Pattern: `^[A-Za-z0-9_.:\-]+$`, MaxLength: intPtr(64), Description: "Strategy code."},
+		}),
+		func(ctx context.Context, b Retro, in retroTradesIn) (autotrader.Result, error) {
+			from, err := parseDate("from", in.From)
+			if err != nil {
+				return nil, err
+			}
+			to, err := parseDate("to", in.To)
+			if err != nil {
+				return nil, err
+			}
+			var market *autotrader.RetroTradesParamsMarket
+			if in.Market != nil {
+				v := autotrader.RetroTradesParamsMarket(*in.Market)
+				market = &v
+			}
+			return b.RetroTrades(ctx, &autotrader.RetroTradesParams{From: from, To: to, Market: market, Strategy: in.Strategy, Limit: in.Limit, Cursor: in.Cursor})
+		})
+}
+
+func intPtr(n int) *int { return &n }
 
 func registerDataGaps(s *gmcp.Server, b Retro) {
 	addRetroTool(s, b, "data_gaps",

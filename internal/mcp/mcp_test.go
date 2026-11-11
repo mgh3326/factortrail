@@ -171,8 +171,8 @@ func TestToolsListOverHTTPIsStatelessAndListsTheProfile(t *testing.T) {
 	var tools []struct {
 		Name string `json:"name"`
 	}
-	if err := json.Unmarshal(out.Result.Tools, &tools); err != nil || len(tools) != 8 {
-		t.Fatalf("tools = %s (%v), want the eight retro tools", out.Result.Tools, err)
+	if err := json.Unmarshal(out.Result.Tools, &tools); err != nil || len(tools) != 9 {
+		t.Fatalf("tools = %s (%v), want the nine retro tools", out.Result.Tools, err)
 	}
 	// A call to a tool that is not registered is a JSON-RPC error, not a result.
 	_, body = rawPost(t, srv.URL, "", nil, `{"jsonrpc":"2.0","id":2,"method":"tools/call","params":{"name":"place_order","arguments":{}}}`)
