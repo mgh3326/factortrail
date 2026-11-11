@@ -19,6 +19,7 @@ type Upstream interface {
 	MockExperiments(context.Context, *autotrader.MockExperimentsParams) (autotrader.Result, error)
 	GetBars(context.Context, *autotrader.GetBarsParams) (autotrader.Result, error)
 	DataGaps(context.Context, *autotrader.DataGapsParams) (autotrader.Result, error)
+	RetroTrades(context.Context, *autotrader.RetroTradesParams) (autotrader.Result, error)
 }
 
 // ObservedUpstream counts and times every upstream call, and reports the
@@ -65,6 +66,10 @@ func (u *ObservedUpstream) GetBars(ctx context.Context, q *autotrader.GetBarsPar
 
 func (u *ObservedUpstream) DataGaps(ctx context.Context, q *autotrader.DataGapsParams) (autotrader.Result, error) {
 	return u.call("data_gaps", func() (autotrader.Result, error) { return u.next.DataGaps(ctx, q) })
+}
+
+func (u *ObservedUpstream) RetroTrades(ctx context.Context, q *autotrader.RetroTradesParams) (autotrader.Result, error) {
+	return u.call("retro_trades", func() (autotrader.Result, error) { return u.next.RetroTrades(ctx, q) })
 }
 
 func (u *ObservedUpstream) call(op string, do func() (autotrader.Result, error)) (autotrader.Result, error) {

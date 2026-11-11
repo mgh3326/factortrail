@@ -305,8 +305,8 @@ func TestEndToEndThroughAuth(t *testing.T) {
 	if err != nil {
 		t.Fatal(err)
 	}
-	if len(list.Tools) != 8 {
-		t.Fatalf("tools = %d, want the 8 retro tools", len(list.Tools))
+	if len(list.Tools) != 9 {
+		t.Fatalf("tools = %d, want the 9 retro tools", len(list.Tools))
 	}
 	if _, err := cs.CallTool(ctx, &gmcp.CallToolParams{Name: "place_order", Arguments: map[string]any{}}); err == nil {
 		t.Fatal("call of an unregistered tool succeeded")

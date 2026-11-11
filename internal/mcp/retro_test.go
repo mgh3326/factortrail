@@ -123,7 +123,7 @@ func args(q map[string]string) map[string]any {
 	return out
 }
 
-func TestRetroProfileIsExactlyTheEightContractTools(t *testing.T) {
+func TestRetroProfileIsExactlyTheNineContractTools(t *testing.T) {
 	p, err := lookupProfile("retro")
 	if err != nil {
 		t.Fatal(err)
@@ -163,6 +163,52 @@ func TestRetroProfileIsExactlyTheEightContractTools(t *testing.T) {
 	sort.Strings(listed)
 	if !reflect.DeepEqual(listed, want) {
 		t.Fatalf("tools/list = %v, want exactly %v", listed, want)
+	}
+}
+
+// Each tool's input schema equals the query parameters of its operation in
+// the pinned spec, except the named consumer-required market extension.
+var consumerRequiredParameterExceptions = map[string]map[string]bool{
+	"get_bars":     {"market": true},
+	"retro_symbol": {"market": true},
+}
+
+func requiredParametersMatch(operation string, specRequired, toolRequired []string) bool {
+	want := map[string]bool{}
+	got := map[string]bool{}
+	for _, name := range specRequired {
+		want[name] = true
+	}
+	for _, name := range toolRequired {
+		got[name] = true
+	}
+	exceptions := consumerRequiredParameterExceptions[operation]
+	for name := range exceptions {
+		if !got[name] {
+			return false
+		}
+		delete(got, name)
+	}
+	for name := range want {
+		if !got[name] {
+			return false
+		}
+		delete(got, name)
+	}
+	return len(got) == 0
+}
+
+func TestRequiredParameterExceptionsAreExact(t *testing.T) {
+	for _, op := range []string{"get_bars", "retro_symbol"} {
+		if requiredParametersMatch(op, []string{"from"}, []string{"from"}) {
+			t.Errorf("%s accepted a missing market", op)
+		}
+	}
+	if requiredParametersMatch("get_bars", []string{"from"}, []string{"from", "market", "extra"}) {
+		t.Fatal("accepted an undeclared required difference")
+	}
+	if len(consumerRequiredParameterExceptions) != 2 || !consumerRequiredParameterExceptions["get_bars"]["market"] || !consumerRequiredParameterExceptions["retro_symbol"]["market"] {
+		t.Fatalf("exception table = %#v", consumerRequiredParameterExceptions)
 	}
 }
 
@@ -271,11 +317,8 @@ func TestToolInputsEqualTheContractQueryParameters(t *testing.T) {
 			sort.Strings(wantRequired)
 			gotRequired := append([]string(nil), in.Required...)
 			sort.Strings(gotRequired)
-			if len(wantRequired) != 0 && !reflect.DeepEqual(gotRequired, wantRequired) {
-				t.Errorf("required = %v, spec %v", gotRequired, wantRequired)
-			}
-			if len(wantRequired) == 0 && len(gotRequired) != 0 {
-				t.Errorf("required = %v, spec has none", gotRequired)
+			if !requiredParametersMatch(tl.Name, wantRequired, gotRequired) {
+				t.Errorf("required = %v, spec %v with consumer exceptions %v", gotRequired, wantRequired, consumerRequiredParameterExceptions[tl.Name])
 			}
 		})
 	}
@@ -289,7 +332,11 @@ func TestEachToolRoundTripsItsExample(t *testing.T) {
 		t.Run(op, func(t *testing.T) {
 			s := newRetroServer(t)
 			ex := examples[op]
-			tr := s.call(t, op, args(ex.Request.Query))
+			toolArgs := args(ex.Request.Query)
+			if op == "retro_symbol" {
+				toolArgs["market"] = "kr"
+			}
+			tr := s.call(t, op, toolArgs)
 			if tr.IsError {
 				t.Fatalf("tool error: %s", tr.text())
 			}
@@ -307,6 +354,9 @@ func TestEachToolRoundTripsItsExample(t *testing.T) {
 			wantQuery := map[string][]string{}
 			for k, v := range ex.Request.Query {
 				wantQuery[k] = []string{v}
+			}
+			if op == "retro_symbol" {
+				wantQuery["market"] = []string{"kr"}
 			}
 			if !reflect.DeepEqual(r.Query, wantQuery) {
 				t.Errorf("upstream query = %v, want %v", r.Query, wantQuery)
@@ -399,6 +449,8 @@ func TestInvalidArgumentsNeverReachTheUpstream(t *testing.T) {
 		{"path argument", "retro_day", map[string]any{"market": "XSYN", "date": "2026-01-02", "path": "/admin"}},
 		{"operation argument", "retro_day", map[string]any{"market": "XSYN", "date": "2026-01-02", "operation": "get_bars"}},
 		{"base_url argument", "get_bars", map[string]any{"symbol": "S", "tf": "1d", "from": "2026-01-02", "to": "2026-01-02", "base_url": "http://evil.example"}},
+		{"get_bars missing market", "get_bars", map[string]any{"symbol": "BTC", "tf": "1d", "from": "2026-01-02", "to": "2026-01-02"}},
+		{"retro_symbol missing market", "retro_symbol", map[string]any{"symbol": "BTC", "from": "2026-01-02", "to": "2026-01-02"}},
 		{"missing required", "retro_day", map[string]any{"market": "XSYN"}},
 		{"malformed date", "retro_day", map[string]any{"market": "XSYN", "date": "2026-13-45"}},
 		{"date with time", "retro_day", map[string]any{"market": "XSYN", "date": "2026-01-02T00:00:00Z"}},
@@ -407,7 +459,9 @@ func TestInvalidArgumentsNeverReachTheUpstream(t *testing.T) {
 		{"limit not an integer", "data_gaps", map[string]any{"limit": 1.5}},
 		{"cursor with a slash", "data_gaps", map[string]any{"cursor": "a/b"}},
 		{"cursor too long", "data_gaps", map[string]any{"cursor": strings.Repeat("a", 129)}},
-		{"timeframe outside the enum", "get_bars", map[string]any{"symbol": "S", "tf": "2h", "from": "2026-01-02", "to": "2026-01-02"}},
+		{"timeframe outside the enum", "get_bars", map[string]any{"symbol": "S", "market": "kr", "tf": "2h", "from": "2026-01-02", "to": "2026-01-02"}},
+		{"market outside enum", "get_bars", map[string]any{"symbol": "BTC", "market": "xx", "tf": "1d", "from": "2026-01-02", "to": "2026-01-02"}},
+		{"strategy outside pattern", "retro_trades", map[string]any{"from": "2026-01-02", "to": "2026-01-02", "strategy": "bad/value"}},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
@@ -441,8 +495,8 @@ func TestUnregisteredToolsAreRefusedWithoutAnUpstreamCall(t *testing.T) {
 // Without upstream settings the tools stay listed, and a call says so.
 func TestToolsAnswerWhenTheUpstreamIsNotConfigured(t *testing.T) {
 	cs := connect(t, newServer("test", retroTools, nil, nil))
-	if got := listNames(t, cs); len(got) != 8 {
-		t.Fatalf("tools/list = %v, want 8 tools", got)
+	if got := listNames(t, cs); len(got) != 9 {
+		t.Fatalf("tools/list = %v, want 9 tools", got)
 	}
 	res, err := cs.CallTool(ctxT(t), &gmcp.CallToolParams{Name: "data_gaps", Arguments: map[string]any{}})
 	if err != nil {

@@ -68,7 +68,12 @@ func opCalls(t *testing.T) map[string]func(*Provider, map[string]string) (Result
 			return p.RetroDay(ctx, &RetroDayParams{Market: q["market"], Date: d(q, "date")})
 		},
 		"retro_symbol": func(p *Provider, q map[string]string) (Result, error) {
-			return p.RetroSymbol(ctx, &RetroSymbolParams{Symbol: q["symbol"], From: d(q, "from"), To: d(q, "to")})
+			market := RetroSymbolParamsMarket(q["market"])
+			var marketPtr *RetroSymbolParamsMarket
+			if q["market"] != "" {
+				marketPtr = &market
+			}
+			return p.RetroSymbol(ctx, &RetroSymbolParams{Symbol: q["symbol"], Market: marketPtr, From: d(q, "from"), To: d(q, "to")})
 		},
 		"retro_funnel": func(p *Provider, q map[string]string) (Result, error) {
 			return p.RetroFunnel(ctx, &RetroFunnelParams{Market: q["market"], From: d(q, "from"), To: d(q, "to")})
@@ -83,10 +88,18 @@ func opCalls(t *testing.T) map[string]func(*Provider, map[string]string) (Result
 			return p.MockExperiments(ctx, &MockExperimentsParams{StrategyId: opt(q, "strategy_id")})
 		},
 		"get_bars": func(p *Provider, q map[string]string) (Result, error) {
-			return p.GetBars(ctx, &GetBarsParams{Symbol: q["symbol"], Tf: GetBarsParamsTf(q["tf"]), From: d(q, "from"), To: d(q, "to")})
+			market := GetBarsParamsMarket(q["market"])
+			var marketPtr *GetBarsParamsMarket
+			if q["market"] != "" {
+				marketPtr = &market
+			}
+			return p.GetBars(ctx, &GetBarsParams{Symbol: q["symbol"], Market: marketPtr, Tf: GetBarsParamsTf(q["tf"]), From: d(q, "from"), To: d(q, "to")})
 		},
 		"data_gaps": func(p *Provider, _ map[string]string) (Result, error) {
 			return p.DataGaps(ctx, &DataGapsParams{})
+		},
+		"retro_trades": func(p *Provider, q map[string]string) (Result, error) {
+			return p.RetroTrades(ctx, &RetroTradesParams{From: d(q, "from"), To: d(q, "to"), Market: (*RetroTradesParamsMarket)(opt(q, "market")), Strategy: opt(q, "strategy")})
 		},
 	}
 }
