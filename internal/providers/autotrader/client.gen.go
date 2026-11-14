@@ -40,31 +40,319 @@ func (e BarRowMarket) Valid() bool {
 
 // Defines values for ChainRowStage.
 const (
-	Candidate ChainRowStage = "candidate"
-	Fill      ChainRowStage = "fill"
-	Lot       ChainRowStage = "lot"
-	Markout   ChainRowStage = "markout"
-	Order     ChainRowStage = "order"
-	Proposal  ChainRowStage = "proposal"
-	Rung      ChainRowStage = "rung"
+	ChainRowStageCandidate ChainRowStage = "candidate"
+	ChainRowStageFill      ChainRowStage = "fill"
+	ChainRowStageLot       ChainRowStage = "lot"
+	ChainRowStageMarkout   ChainRowStage = "markout"
+	ChainRowStageOrder     ChainRowStage = "order"
+	ChainRowStageProposal  ChainRowStage = "proposal"
+	ChainRowStageRung      ChainRowStage = "rung"
 )
 
 // Valid indicates whether the value is a known member of the ChainRowStage enum.
 func (e ChainRowStage) Valid() bool {
 	switch e {
-	case Candidate:
+	case ChainRowStageCandidate:
 		return true
-	case Fill:
+	case ChainRowStageFill:
 		return true
-	case Lot:
+	case ChainRowStageLot:
 		return true
-	case Markout:
+	case ChainRowStageMarkout:
 		return true
-	case Order:
+	case ChainRowStageOrder:
 		return true
-	case Proposal:
+	case ChainRowStageProposal:
 		return true
-	case Rung:
+	case ChainRowStageRung:
+		return true
+	default:
+		return false
+	}
+}
+
+// Defines values for DecisionReason.
+const (
+	DecisionReasonAmbiguousAttempts          DecisionReason = "ambiguous_attempts"
+	DecisionReasonAmbiguousDecision          DecisionReason = "ambiguous_decision"
+	DecisionReasonAttemptUnconfirmed         DecisionReason = "attempt_unconfirmed"
+	DecisionReasonAttemptsUnavailable        DecisionReason = "attempts_unavailable"
+	DecisionReasonCandidateOutsideTradingDay DecisionReason = "candidate_outside_trading_day"
+	DecisionReasonCandidateRefUnresolved     DecisionReason = "candidate_ref_unresolved"
+	DecisionReasonLessThannil                DecisionReason = "<nil>"
+	DecisionReasonMissingCurrency            DecisionReason = "missing_currency"
+	DecisionReasonMissingData                DecisionReason = "missing_data"
+	DecisionReasonMissingEntryPrice          DecisionReason = "missing_entry_price"
+	DecisionReasonMissingEntrySession        DecisionReason = "missing_entry_session"
+	DecisionReasonMissingNotional            DecisionReason = "missing_notional"
+	DecisionReasonNoBudgetCap                DecisionReason = "no_budget_cap"
+	DecisionReasonNoCandidateRef             DecisionReason = "no_candidate_ref"
+	DecisionReasonNoCompleteSession          DecisionReason = "no_complete_session"
+	DecisionReasonNoDecisionLink             DecisionReason = "no_decision_link"
+	DecisionReasonNoExitFill                 DecisionReason = "no_exit_fill"
+	DecisionReasonNoFills                    DecisionReason = "no_fills"
+	DecisionReasonNoLinkedOrder              DecisionReason = "no_linked_order"
+	DecisionReasonNoPlannedQuantity          DecisionReason = "no_planned_quantity"
+	DecisionReasonNoProposal                 DecisionReason = "no_proposal"
+	DecisionReasonNoReferencePrice           DecisionReason = "no_reference_price"
+	DecisionReasonNoRiskPerUnit              DecisionReason = "no_risk_per_unit"
+	DecisionReasonNoStopRecorded             DecisionReason = "no_stop_recorded"
+	DecisionReasonNotApplicable              DecisionReason = "not_applicable"
+	DecisionReasonNotProvided                DecisionReason = "not_provided"
+	DecisionReasonRateUnavailable            DecisionReason = "rate_unavailable"
+	DecisionReasonStopNotBelowReferencePrice DecisionReason = "stop_not_below_reference_price"
+	DecisionReasonWindowOpen                 DecisionReason = "window_open"
+)
+
+// Valid indicates whether the value is a known member of the DecisionReason enum.
+func (e DecisionReason) Valid() bool {
+	switch e {
+	case DecisionReasonAmbiguousAttempts:
+		return true
+	case DecisionReasonAmbiguousDecision:
+		return true
+	case DecisionReasonAttemptUnconfirmed:
+		return true
+	case DecisionReasonAttemptsUnavailable:
+		return true
+	case DecisionReasonCandidateOutsideTradingDay:
+		return true
+	case DecisionReasonCandidateRefUnresolved:
+		return true
+	case DecisionReasonLessThannil:
+		return true
+	case DecisionReasonMissingCurrency:
+		return true
+	case DecisionReasonMissingData:
+		return true
+	case DecisionReasonMissingEntryPrice:
+		return true
+	case DecisionReasonMissingEntrySession:
+		return true
+	case DecisionReasonMissingNotional:
+		return true
+	case DecisionReasonNoBudgetCap:
+		return true
+	case DecisionReasonNoCandidateRef:
+		return true
+	case DecisionReasonNoCompleteSession:
+		return true
+	case DecisionReasonNoDecisionLink:
+		return true
+	case DecisionReasonNoExitFill:
+		return true
+	case DecisionReasonNoFills:
+		return true
+	case DecisionReasonNoLinkedOrder:
+		return true
+	case DecisionReasonNoPlannedQuantity:
+		return true
+	case DecisionReasonNoProposal:
+		return true
+	case DecisionReasonNoReferencePrice:
+		return true
+	case DecisionReasonNoRiskPerUnit:
+		return true
+	case DecisionReasonNoStopRecorded:
+		return true
+	case DecisionReasonNotApplicable:
+		return true
+	case DecisionReasonNotProvided:
+		return true
+	case DecisionReasonRateUnavailable:
+		return true
+	case DecisionReasonStopNotBelowReferencePrice:
+		return true
+	case DecisionReasonWindowOpen:
+		return true
+	default:
+		return false
+	}
+}
+
+// Defines values for DecisionRowDecisionKind.
+const (
+	DecisionRowDecisionKindDeclined    DecisionRowDecisionKind = "declined"
+	DecisionRowDecisionKindDirectOrder DecisionRowDecisionKind = "direct_order"
+	DecisionRowDecisionKindLessThannil DecisionRowDecisionKind = "<nil>"
+	DecisionRowDecisionKindProposal    DecisionRowDecisionKind = "proposal"
+)
+
+// Valid indicates whether the value is a known member of the DecisionRowDecisionKind enum.
+func (e DecisionRowDecisionKind) Valid() bool {
+	switch e {
+	case DecisionRowDecisionKindDeclined:
+		return true
+	case DecisionRowDecisionKindDirectOrder:
+		return true
+	case DecisionRowDecisionKindLessThannil:
+		return true
+	case DecisionRowDecisionKindProposal:
+		return true
+	default:
+		return false
+	}
+}
+
+// Defines values for DecisionRowExcursionBasis.
+const (
+	DecisionRowExcursionBasisInference DecisionRowExcursionBasis = "inference"
+)
+
+// Valid indicates whether the value is a known member of the DecisionRowExcursionBasis enum.
+func (e DecisionRowExcursionBasis) Valid() bool {
+	switch e {
+	case DecisionRowExcursionBasisInference:
+		return true
+	default:
+		return false
+	}
+}
+
+// Defines values for DecisionRowFillTimeBasis.
+const (
+	DecisionRowFillTimeBasisBrokerFillTime  DecisionRowFillTimeBasis = "broker_fill_time"
+	DecisionRowFillTimeBasisBrokerOrderTime DecisionRowFillTimeBasis = "broker_order_time"
+	DecisionRowFillTimeBasisLessThannil     DecisionRowFillTimeBasis = "<nil>"
+	DecisionRowFillTimeBasisObservedAt      DecisionRowFillTimeBasis = "observed_at"
+)
+
+// Valid indicates whether the value is a known member of the DecisionRowFillTimeBasis enum.
+func (e DecisionRowFillTimeBasis) Valid() bool {
+	switch e {
+	case DecisionRowFillTimeBasisBrokerFillTime:
+		return true
+	case DecisionRowFillTimeBasisBrokerOrderTime:
+		return true
+	case DecisionRowFillTimeBasisLessThannil:
+		return true
+	case DecisionRowFillTimeBasisObservedAt:
+		return true
+	default:
+		return false
+	}
+}
+
+// Defines values for DecisionRowMarket.
+const (
+	DecisionRowMarketCrypto      DecisionRowMarket = "crypto"
+	DecisionRowMarketKr          DecisionRowMarket = "kr"
+	DecisionRowMarketLessThannil DecisionRowMarket = "<nil>"
+	DecisionRowMarketUs          DecisionRowMarket = "us"
+)
+
+// Valid indicates whether the value is a known member of the DecisionRowMarket enum.
+func (e DecisionRowMarket) Valid() bool {
+	switch e {
+	case DecisionRowMarketCrypto:
+		return true
+	case DecisionRowMarketKr:
+		return true
+	case DecisionRowMarketLessThannil:
+		return true
+	case DecisionRowMarketUs:
+		return true
+	default:
+		return false
+	}
+}
+
+// Defines values for DecisionRowOrderStates.
+const (
+	Cancelled       DecisionRowOrderStates = "cancelled"
+	Expired         DecisionRowOrderStates = "expired"
+	Filled          DecisionRowOrderStates = "filled"
+	PartiallyFilled DecisionRowOrderStates = "partially_filled"
+	Rejected        DecisionRowOrderStates = "rejected"
+	Unresolved      DecisionRowOrderStates = "unresolved"
+	Working         DecisionRowOrderStates = "working"
+)
+
+// Valid indicates whether the value is a known member of the DecisionRowOrderStates enum.
+func (e DecisionRowOrderStates) Valid() bool {
+	switch e {
+	case Cancelled:
+		return true
+	case Expired:
+		return true
+	case Filled:
+		return true
+	case PartiallyFilled:
+		return true
+	case Rejected:
+		return true
+	case Unresolved:
+		return true
+	case Working:
+		return true
+	default:
+		return false
+	}
+}
+
+// Defines values for DecisionRowReferenceKind.
+const (
+	DecisionRowReferenceKindApprovalPrice   DecisionRowReferenceKind = "approval_price"
+	DecisionRowReferenceKindCandidatePrice  DecisionRowReferenceKind = "candidate_price"
+	DecisionRowReferenceKindLessThannil     DecisionRowReferenceKind = "<nil>"
+	DecisionRowReferenceKindLimit           DecisionRowReferenceKind = "limit"
+	DecisionRowReferenceKindQuoteAtDecision DecisionRowReferenceKind = "quote_at_decision"
+)
+
+// Valid indicates whether the value is a known member of the DecisionRowReferenceKind enum.
+func (e DecisionRowReferenceKind) Valid() bool {
+	switch e {
+	case DecisionRowReferenceKindApprovalPrice:
+		return true
+	case DecisionRowReferenceKindCandidatePrice:
+		return true
+	case DecisionRowReferenceKindLessThannil:
+		return true
+	case DecisionRowReferenceKindLimit:
+		return true
+	case DecisionRowReferenceKindQuoteAtDecision:
+		return true
+	default:
+		return false
+	}
+}
+
+// Defines values for DecisionRowRiskBasis.
+const (
+	DecisionRowRiskBasisInference   DecisionRowRiskBasis = "inference"
+	DecisionRowRiskBasisLessThannil DecisionRowRiskBasis = "<nil>"
+	DecisionRowRiskBasisRecorded    DecisionRowRiskBasis = "recorded"
+)
+
+// Valid indicates whether the value is a known member of the DecisionRowRiskBasis enum.
+func (e DecisionRowRiskBasis) Valid() bool {
+	switch e {
+	case DecisionRowRiskBasisInference:
+		return true
+	case DecisionRowRiskBasisLessThannil:
+		return true
+	case DecisionRowRiskBasisRecorded:
+		return true
+	default:
+		return false
+	}
+}
+
+// Defines values for DecisionRowSide.
+const (
+	DecisionRowSideBuy         DecisionRowSide = "buy"
+	DecisionRowSideLessThannil DecisionRowSide = "<nil>"
+	DecisionRowSideSell        DecisionRowSide = "sell"
+)
+
+// Valid indicates whether the value is a known member of the DecisionRowSide enum.
+func (e DecisionRowSide) Valid() bool {
+	switch e {
+	case DecisionRowSideBuy:
+		return true
+	case DecisionRowSideLessThannil:
+		return true
+	case DecisionRowSideSell:
 		return true
 	default:
 		return false
@@ -167,6 +455,87 @@ func (e EvidenceBasis) Valid() bool {
 	}
 }
 
+// Defines values for ExcursionStatus.
+const (
+	ExcursionStatusComplete ExcursionStatus = "complete"
+	ExcursionStatusPending  ExcursionStatus = "pending"
+	ExcursionStatusUnknown  ExcursionStatus = "unknown"
+)
+
+// Valid indicates whether the value is a known member of the ExcursionStatus enum.
+func (e ExcursionStatus) Valid() bool {
+	switch e {
+	case ExcursionStatusComplete:
+		return true
+	case ExcursionStatusPending:
+		return true
+	case ExcursionStatusUnknown:
+		return true
+	default:
+		return false
+	}
+}
+
+// Defines values for LinkBasis.
+const (
+	LinkBasisInference   LinkBasis = "inference"
+	LinkBasisLessThannil LinkBasis = "<nil>"
+	LinkBasisRecorded    LinkBasis = "recorded"
+)
+
+// Valid indicates whether the value is a known member of the LinkBasis enum.
+func (e LinkBasis) Valid() bool {
+	switch e {
+	case LinkBasisInference:
+		return true
+	case LinkBasisLessThannil:
+		return true
+	case LinkBasisRecorded:
+		return true
+	default:
+		return false
+	}
+}
+
+// Defines values for LinkReason.
+const (
+	LinkReasonAmbiguousAttempts          LinkReason = "ambiguous_attempts"
+	LinkReasonAmbiguousDecision          LinkReason = "ambiguous_decision"
+	LinkReasonAttemptUnconfirmed         LinkReason = "attempt_unconfirmed"
+	LinkReasonAttemptsUnavailable        LinkReason = "attempts_unavailable"
+	LinkReasonCandidateOutsideTradingDay LinkReason = "candidate_outside_trading_day"
+	LinkReasonCandidateRefUnresolved     LinkReason = "candidate_ref_unresolved"
+	LinkReasonLessThannil                LinkReason = "<nil>"
+	LinkReasonNoCandidateRef             LinkReason = "no_candidate_ref"
+	LinkReasonNoDecisionLink             LinkReason = "no_decision_link"
+)
+
+// Valid indicates whether the value is a known member of the LinkReason enum.
+func (e LinkReason) Valid() bool {
+	switch e {
+	case LinkReasonAmbiguousAttempts:
+		return true
+	case LinkReasonAmbiguousDecision:
+		return true
+	case LinkReasonAttemptUnconfirmed:
+		return true
+	case LinkReasonAttemptsUnavailable:
+		return true
+	case LinkReasonCandidateOutsideTradingDay:
+		return true
+	case LinkReasonCandidateRefUnresolved:
+		return true
+	case LinkReasonLessThannil:
+		return true
+	case LinkReasonNoCandidateRef:
+		return true
+	case LinkReasonNoDecisionLink:
+		return true
+	default:
+		return false
+	}
+}
+
 // Defines values for PositionRowLotState.
 const (
 	PositionRowLotStateKnown   PositionRowLotState = "known"
@@ -248,6 +617,63 @@ func (e ScoreRowScope) Valid() bool {
 	}
 }
 
+// Defines values for TradeCostsEstimatedBasis.
+const (
+	TradeCostsEstimatedBasisInference TradeCostsEstimatedBasis = "inference"
+)
+
+// Valid indicates whether the value is a known member of the TradeCostsEstimatedBasis enum.
+func (e TradeCostsEstimatedBasis) Valid() bool {
+	switch e {
+	case TradeCostsEstimatedBasisInference:
+		return true
+	default:
+		return false
+	}
+}
+
+// Defines values for TradeCostsEstimatedReason.
+const (
+	TradeCostsEstimatedReasonLessThannil     TradeCostsEstimatedReason = "<nil>"
+	TradeCostsEstimatedReasonMissingNotional TradeCostsEstimatedReason = "missing_notional"
+	TradeCostsEstimatedReasonRateUnavailable TradeCostsEstimatedReason = "rate_unavailable"
+)
+
+// Valid indicates whether the value is a known member of the TradeCostsEstimatedReason enum.
+func (e TradeCostsEstimatedReason) Valid() bool {
+	switch e {
+	case TradeCostsEstimatedReasonLessThannil:
+		return true
+	case TradeCostsEstimatedReasonMissingNotional:
+		return true
+	case TradeCostsEstimatedReasonRateUnavailable:
+		return true
+	default:
+		return false
+	}
+}
+
+// Defines values for TradeCostsRecordedReason.
+const (
+	TradeCostsRecordedReasonLessThannil     TradeCostsRecordedReason = "<nil>"
+	TradeCostsRecordedReasonMissingCurrency TradeCostsRecordedReason = "missing_currency"
+	TradeCostsRecordedReasonNotProvided     TradeCostsRecordedReason = "not_provided"
+)
+
+// Valid indicates whether the value is a known member of the TradeCostsRecordedReason enum.
+func (e TradeCostsRecordedReason) Valid() bool {
+	switch e {
+	case TradeCostsRecordedReasonLessThannil:
+		return true
+	case TradeCostsRecordedReasonMissingCurrency:
+		return true
+	case TradeCostsRecordedReasonNotProvided:
+		return true
+	default:
+		return false
+	}
+}
+
 // Defines values for TradeReviewRowPnlClass.
 const (
 	TradeReviewRowPnlClassMissing       TradeReviewRowPnlClass = "missing"
@@ -266,6 +692,30 @@ func (e TradeReviewRowPnlClass) Valid() bool {
 	case TradeReviewRowPnlClassRecorded:
 		return true
 	case TradeReviewRowPnlClassUnknown:
+		return true
+	default:
+		return false
+	}
+}
+
+// Defines values for TradeRowFillTimeBasis.
+const (
+	TradeRowFillTimeBasisBrokerFillTime  TradeRowFillTimeBasis = "broker_fill_time"
+	TradeRowFillTimeBasisBrokerOrderTime TradeRowFillTimeBasis = "broker_order_time"
+	TradeRowFillTimeBasisLessThannil     TradeRowFillTimeBasis = "<nil>"
+	TradeRowFillTimeBasisObservedAt      TradeRowFillTimeBasis = "observed_at"
+)
+
+// Valid indicates whether the value is a known member of the TradeRowFillTimeBasis enum.
+func (e TradeRowFillTimeBasis) Valid() bool {
+	switch e {
+	case TradeRowFillTimeBasisBrokerFillTime:
+		return true
+	case TradeRowFillTimeBasisBrokerOrderTime:
+		return true
+	case TradeRowFillTimeBasisLessThannil:
+		return true
+	case TradeRowFillTimeBasisObservedAt:
 		return true
 	default:
 		return false
@@ -389,6 +839,27 @@ func (e GetBarsParamsTf) Valid() bool {
 	}
 }
 
+// Defines values for RetroDecisionsParamsMarket.
+const (
+	RetroDecisionsParamsMarketCrypto RetroDecisionsParamsMarket = "crypto"
+	RetroDecisionsParamsMarketKr     RetroDecisionsParamsMarket = "kr"
+	RetroDecisionsParamsMarketUs     RetroDecisionsParamsMarket = "us"
+)
+
+// Valid indicates whether the value is a known member of the RetroDecisionsParamsMarket enum.
+func (e RetroDecisionsParamsMarket) Valid() bool {
+	switch e {
+	case RetroDecisionsParamsMarketCrypto:
+		return true
+	case RetroDecisionsParamsMarketKr:
+		return true
+	case RetroDecisionsParamsMarketUs:
+		return true
+	default:
+		return false
+	}
+}
+
 // Defines values for RetroSymbolParamsMarket.
 const (
 	RetroSymbolParamsMarketCrypto RetroSymbolParamsMarket = "crypto"
@@ -487,16 +958,28 @@ type Benchmark struct {
 	UnknownReason *UnknownReason `json:"unknown_reason"`
 }
 
-// ChainRow Order rows originate from live broker order ledgers, including direct orders. An unambiguous order links to its rung; fills link to their ledger order. Order statuses are filled, partially_filled, working, cancelled, expired, rejected, and unresolved. Authoritative fills take precedence, followed by broker terminal status, then the linked rung expiry inference; a current-day open order is working and an older one without terminal evidence is unresolved. Rejection reasons are rate_limited, price_limit, insufficient_balance, market_closed, invalid_order, or broker_other. Expiry reasons are day_order_expired or expired_inference_no_broker_original; cancellation uses cancelled and unresolved uses no_terminal_evidence.
+// ChainRow Order rows originate from live broker order ledgers, including direct orders. An unambiguous order links to its rung; fills link to their ledger order. Order statuses are filled, partially_filled, working, cancelled, expired, rejected, and unresolved. Authoritative fills take precedence, followed by broker terminal status, then the linked rung expiry inference; a current-day open order is working and an older one without terminal evidence is unresolved. Rejection reasons are rate_limited, price_limit, insufficient_balance, market_closed, invalid_order, or broker_other. Expiry reasons are day_order_expired or expired_inference_no_broker_original; cancellation uses cancelled and unresolved uses no_terminal_evidence. The optional link fields are present only with a value. link_basis says how linked_ref was made; decision_ref is the decision a proposal, rung or order descends from and decision_link_basis how that was made. An order whose send key has attempts of one decision links to that decision (recorded with a sent outcome, otherwise inference with attempt_unconfirmed); attempts of several decisions give no link (ambiguous_attempts); with no attempt the rung match applies (idempotency key recorded, correlation only inference). A proposal links to the candidate its decision names; one without a decision links to an earlier candidate of the same KST day only (inference).
 type ChainRow struct {
 	Basis EvidenceBasis `json:"basis"`
 
 	// Currency Code or opaque reference only; no raw exception or broker message.
-	Currency *string    `json:"currency"`
-	EventAt  *time.Time `json:"event_at"`
+	Currency *string `json:"currency"`
+
+	// DecisionLinkBasis How a link was made. recorded is an exact key a writer stored at its own event; inference is a heuristic, or a stored key without proof that the order was sent.
+	DecisionLinkBasis *LinkBasis `json:"decision_link_basis,omitempty"`
+
+	// DecisionRef Code or opaque reference only; no raw exception or broker message.
+	DecisionRef *string    `json:"decision_ref,omitempty"`
+	EventAt     *time.Time `json:"event_at"`
 
 	// EventRef Code or opaque reference only; no raw exception or broker message.
 	EventRef string `json:"event_ref"`
+
+	// LinkBasis How a link was made. recorded is an exact key a writer stored at its own event; inference is a heuristic, or a stored key without proof that the order was sent.
+	LinkBasis *LinkBasis `json:"link_basis,omitempty"`
+
+	// LinkReason Closed code for a missing or weakened link. ambiguous_attempts - the live send attempts of one order key belong to several decisions. attempt_unconfirmed - one decision, but no sent outcome was recorded. no_candidate_ref, candidate_outside_trading_day, candidate_ref_unresolved - why a proposal has no candidate link. ambiguous_decision, no_decision_link - why a trade has no decision link. attempts_unavailable - the send-attempt read failed or was cut off, so no link was concluded.
+	LinkReason *LinkReason `json:"link_reason,omitempty"`
 
 	// LinkedRef Code or opaque reference only; no raw exception or broker message.
 	LinkedRef *string `json:"linked_ref"`
@@ -531,6 +1014,146 @@ type DataGapsResponse struct {
 
 // DecimalValue Exact decimal string; no float conversion. Unit and currency are given by the containing row.
 type DecimalValue = string
+
+// DecisionReason Closed reason vocabulary for a null or weakened decision field. Combines the link reasons of ChainRow with the metric reasons of the risk, MFE/MAE and cost calculations.
+type DecisionReason string
+
+// DecisionRow One recorded decision and what was derived from it at read time. Every *_reason field is present only to explain its sibling null (or weakened) value; null reasons are not_applicable. candidate_ref is the pick the recorded candidate reference resolves to. order_states uses the chain's closed vocabulary; order_count is the number of order ledger rows whose send attempts resolve to this decision (null with attempts_unavailable when that read failed). entry_avg_price and filled_quantity are the buy fills of those orders. costs keeps broker-reported costs apart from the policy estimate. mfe/mae are daily-bar excursions (basis always inference, adjusted unknown). retrospective_ref is the stored decision_id link (recorded) or the single correlation-derived review (inference); r_multiple needs both entry and exit fills plus a known risk per unit.
+type DecisionRow struct {
+	Adjusted *bool         `json:"adjusted"`
+	Basis    EvidenceBasis `json:"basis"`
+
+	// CandidateLinkBasis How a link was made. recorded is an exact key a writer stored at its own event; inference is a heuristic, or a stored key without proof that the order was sent.
+	CandidateLinkBasis *LinkBasis `json:"candidate_link_basis"`
+
+	// CandidateReason Closed reason vocabulary for a null or weakened decision field. Combines the link reasons of ChainRow with the metric reasons of the risk, MFE/MAE and cost calculations.
+	CandidateReason *DecisionReason `json:"candidate_reason"`
+
+	// CandidateRef Code or opaque reference only; no raw exception or broker message.
+	CandidateRef *string     `json:"candidate_ref"`
+	Costs        *TradeCosts `json:"costs"`
+	DecidedAt    *time.Time  `json:"decided_at"`
+
+	// DecidedBy Code or opaque reference only; no raw exception or broker message.
+	DecidedBy    *string                  `json:"decided_by"`
+	DecisionKind *DecisionRowDecisionKind `json:"decision_kind"`
+
+	// DecisionRef Code or opaque reference only; no raw exception or broker message.
+	DecisionRef string `json:"decision_ref"`
+
+	// EntryAvgPrice Exact decimal string; no float conversion. Unit and currency are given by the containing row.
+	EntryAvgPrice  *DecimalValue             `json:"entry_avg_price"`
+	ExcursionBasis DecisionRowExcursionBasis `json:"excursion_basis"`
+
+	// FillReason Closed reason vocabulary for a null or weakened decision field. Combines the link reasons of ChainRow with the metric reasons of the risk, MFE/MAE and cost calculations.
+	FillReason    *DecisionReason           `json:"fill_reason"`
+	FillTimeBasis *DecisionRowFillTimeBasis `json:"fill_time_basis"`
+
+	// FilledQuantity Exact decimal string; no float conversion. Unit and currency are given by the containing row.
+	FilledQuantity *DecimalValue `json:"filled_quantity"`
+
+	// Mae MFE or MAE per horizon: 1, 5 and 20 sessions, and to_exit.
+	Mae    Excursions         `json:"mae"`
+	Market *DecisionRowMarket `json:"market"`
+
+	// Mfe MFE or MAE per horizon: 1, 5 and 20 sessions, and to_exit.
+	Mfe        Excursions `json:"mfe"`
+	OrderCount *int       `json:"order_count"`
+
+	// OrderCountReason Closed reason vocabulary for a null or weakened decision field. Combines the link reasons of ChainRow with the metric reasons of the risk, MFE/MAE and cost calculations.
+	OrderCountReason *DecisionReason           `json:"order_count_reason"`
+	OrderStates      *[]DecisionRowOrderStates `json:"order_states"`
+
+	// OrderStatesReason Closed reason vocabulary for a null or weakened decision field. Combines the link reasons of ChainRow with the metric reasons of the risk, MFE/MAE and cost calculations.
+	OrderStatesReason *DecisionReason `json:"order_states_reason"`
+
+	// PlannedQuantity Exact decimal string; no float conversion. Unit and currency are given by the containing row.
+	PlannedQuantity *DecimalValue `json:"planned_quantity"`
+
+	// PlannedReason Closed reason vocabulary for a null or weakened decision field. Combines the link reasons of ChainRow with the metric reasons of the risk, MFE/MAE and cost calculations.
+	PlannedReason *DecisionReason `json:"planned_reason"`
+
+	// PlannedRiskAmount Exact decimal string; no float conversion. Unit and currency are given by the containing row.
+	PlannedRiskAmount *DecimalValue `json:"planned_risk_amount"`
+
+	// ProposalReason Closed reason vocabulary for a null or weakened decision field. Combines the link reasons of ChainRow with the metric reasons of the risk, MFE/MAE and cost calculations.
+	ProposalReason *DecisionReason `json:"proposal_reason"`
+
+	// ProposalRef Code or opaque reference only; no raw exception or broker message.
+	ProposalRef *string `json:"proposal_ref"`
+
+	// RMultiple Exact decimal string; no float conversion. Unit and currency are given by the containing row.
+	RMultiple *DecimalValue `json:"r_multiple"`
+
+	// RMultipleReason Closed reason vocabulary for a null or weakened decision field. Combines the link reasons of ChainRow with the metric reasons of the risk, MFE/MAE and cost calculations.
+	RMultipleReason *DecisionReason           `json:"r_multiple_reason"`
+	ReferenceKind   *DecisionRowReferenceKind `json:"reference_kind"`
+
+	// ReferencePrice Exact decimal string; no float conversion. Unit and currency are given by the containing row.
+	ReferencePrice *DecimalValue `json:"reference_price"`
+
+	// ReferenceReason Closed reason vocabulary for a null or weakened decision field. Combines the link reasons of ChainRow with the metric reasons of the risk, MFE/MAE and cost calculations.
+	ReferenceReason *DecisionReason `json:"reference_reason"`
+
+	// RetrospectiveLinkBasis How a link was made. recorded is an exact key a writer stored at its own event; inference is a heuristic, or a stored key without proof that the order was sent.
+	RetrospectiveLinkBasis *LinkBasis `json:"retrospective_link_basis"`
+
+	// RetrospectiveReason Closed reason vocabulary for a null or weakened decision field. Combines the link reasons of ChainRow with the metric reasons of the risk, MFE/MAE and cost calculations.
+	RetrospectiveReason *DecisionReason `json:"retrospective_reason"`
+
+	// RetrospectiveRef Code or opaque reference only; no raw exception or broker message.
+	RetrospectiveRef *string               `json:"retrospective_ref"`
+	RiskBasis        *DecisionRowRiskBasis `json:"risk_basis"`
+
+	// RiskPctOfBudget Exact decimal string; no float conversion. Unit and currency are given by the containing row.
+	RiskPctOfBudget *DecimalValue `json:"risk_pct_of_budget"`
+
+	// RiskPctOfBudgetReason Closed reason vocabulary for a null or weakened decision field. Combines the link reasons of ChainRow with the metric reasons of the risk, MFE/MAE and cost calculations.
+	RiskPctOfBudgetReason *DecisionReason `json:"risk_pct_of_budget_reason"`
+
+	// RiskPctOfNotional Exact decimal string; no float conversion. Unit and currency are given by the containing row.
+	RiskPctOfNotional *DecimalValue `json:"risk_pct_of_notional"`
+
+	// RiskReason Closed reason vocabulary for a null or weakened decision field. Combines the link reasons of ChainRow with the metric reasons of the risk, MFE/MAE and cost calculations.
+	RiskReason *DecisionReason  `json:"risk_reason"`
+	Side       *DecisionRowSide `json:"side"`
+
+	// StopPrice Exact decimal string; no float conversion. Unit and currency are given by the containing row.
+	StopPrice *DecimalValue `json:"stop_price"`
+
+	// StopSource Code or opaque reference only; no raw exception or broker message.
+	StopSource *string `json:"stop_source"`
+
+	// Strategy Code or opaque reference only; no raw exception or broker message.
+	Strategy *string `json:"strategy"`
+
+	// Symbol Code or opaque reference only; no raw exception or broker message.
+	Symbol string `json:"symbol"`
+}
+
+// DecisionRowDecisionKind defines model for DecisionRow.DecisionKind.
+type DecisionRowDecisionKind string
+
+// DecisionRowExcursionBasis defines model for DecisionRow.ExcursionBasis.
+type DecisionRowExcursionBasis string
+
+// DecisionRowFillTimeBasis defines model for DecisionRow.FillTimeBasis.
+type DecisionRowFillTimeBasis string
+
+// DecisionRowMarket defines model for DecisionRow.Market.
+type DecisionRowMarket string
+
+// DecisionRowOrderStates defines model for DecisionRow.OrderStates.
+type DecisionRowOrderStates string
+
+// DecisionRowReferenceKind defines model for DecisionRow.ReferenceKind.
+type DecisionRowReferenceKind string
+
+// DecisionRowRiskBasis defines model for DecisionRow.RiskBasis.
+type DecisionRowRiskBasis string
+
+// DecisionRowSide defines model for DecisionRow.Side.
+type DecisionRowSide string
 
 // Envelope A null total requires a total/count_unavailable unknown. Every null row value requires a row reason or missing_reason, or an unknown entry with its dotted data path. Never include raw exceptions or broker messages.
 type Envelope struct {
@@ -567,6 +1190,43 @@ type ErrorMessage string
 
 // EvidenceBasis defines model for EvidenceBasis.
 type EvidenceBasis string
+
+// Excursion One MFE or MAE horizon: amount and pct share the entry price unit; r divides by the entry risk per unit when known. status is complete when the window closed, pending while it is still open, and unknown when it can never be computed; a non-complete status carries reason.
+type Excursion struct {
+	// Amount Exact decimal string; no float conversion. Unit and currency are given by the containing row.
+	Amount *DecimalValue `json:"amount"`
+
+	// Pct Exact decimal string; no float conversion. Unit and currency are given by the containing row.
+	Pct *DecimalValue `json:"pct"`
+
+	// R Exact decimal string; no float conversion. Unit and currency are given by the containing row.
+	R *DecimalValue `json:"r"`
+
+	// RReason Closed reason vocabulary for a null or weakened decision field. Combines the link reasons of ChainRow with the metric reasons of the risk, MFE/MAE and cost calculations.
+	RReason *DecisionReason `json:"r_reason,omitempty"`
+
+	// Reason Closed reason vocabulary for a null or weakened decision field. Combines the link reasons of ChainRow with the metric reasons of the risk, MFE/MAE and cost calculations.
+	Reason *DecisionReason `json:"reason"`
+	Status ExcursionStatus `json:"status"`
+}
+
+// ExcursionStatus defines model for Excursion.Status.
+type ExcursionStatus string
+
+// Excursions MFE or MAE per horizon: 1, 5 and 20 sessions, and to_exit.
+type Excursions struct {
+	// N1 One MFE or MAE horizon: amount and pct share the entry price unit; r divides by the entry risk per unit when known. status is complete when the window closed, pending while it is still open, and unknown when it can never be computed; a non-complete status carries reason.
+	N1 Excursion `json:"1"`
+
+	// N20 One MFE or MAE horizon: amount and pct share the entry price unit; r divides by the entry risk per unit when known. status is complete when the window closed, pending while it is still open, and unknown when it can never be computed; a non-complete status carries reason.
+	N20 Excursion `json:"20"`
+
+	// N5 One MFE or MAE horizon: amount and pct share the entry price unit; r divides by the entry risk per unit when known. status is complete when the window closed, pending while it is still open, and unknown when it can never be computed; a non-complete status carries reason.
+	N5 Excursion `json:"5"`
+
+	// ToExit One MFE or MAE horizon: amount and pct share the entry price unit; r divides by the entry risk per unit when known. status is complete when the window closed, pending while it is still open, and unknown when it can never be computed; a non-complete status carries reason.
+	ToExit Excursion `json:"to_exit"`
+}
 
 // ExperimentRow defines model for ExperimentRow.
 type ExperimentRow struct {
@@ -640,6 +1300,12 @@ type GetBarsResponse struct {
 	Data []BarRow `json:"data"`
 }
 
+// LinkBasis How a link was made. recorded is an exact key a writer stored at its own event; inference is a heuristic, or a stored key without proof that the order was sent.
+type LinkBasis string
+
+// LinkReason Closed code for a missing or weakened link. ambiguous_attempts - the live send attempts of one order key belong to several decisions. attempt_unconfirmed - one decision, but no sent outcome was recorded. no_candidate_ref, candidate_outside_trading_day, candidate_ref_unresolved - why a proposal has no candidate link. ambiguous_decision, no_decision_link - why a trade has no decision link. attempts_unavailable - the send-attempt read failed or was cut off, so no link was concluded.
+type LinkReason string
+
 // MockExperimentsResponse total counts matching experiment rows before pagination, or null with count_unavailable. Page length is never total.
 type MockExperimentsResponse struct {
 	Data []ExperimentRow `json:"data"`
@@ -687,6 +1353,11 @@ type PositionRowMarket string
 // RetroDayResponse total counts matching chain events for the requested market and date before pagination, or null with count_unavailable. Page length is never total.
 type RetroDayResponse struct {
 	Data []ChainRow `json:"data"`
+}
+
+// RetroDecisionsResponse total counts matching decision rows in the requested KST window before pagination, or null with count_unavailable. Page length is never total.
+type RetroDecisionsResponse struct {
+	Data []DecisionRow `json:"data"`
 }
 
 // RetroFunnelResponse total counts matching funnel stages for the same cohort before pagination, or null with count_unavailable. Page length is never total.
@@ -759,6 +1430,39 @@ type ScoreRowBasis string
 // ScoreRowScope defines model for ScoreRow.Scope.
 type ScoreRowScope string
 
+// TradeCosts Costs of the ledger fills of the orders recorded for the trade. recorded is what the broker reported and is null (with recorded_reason) when any fill did not provide it; a fee of a fill with fee_basis not_provided is never a recorded zero. fee_includes_tax is true when a fill predates the split of Toss commission and tax and its fee is their sum. estimated is policy round_trip_cost_bps over the entry notional, never mixed into recorded. The reasons are present only when their side is null.
+type TradeCosts struct {
+	Estimated *struct {
+		// Amount Exact decimal string; no float conversion. Unit and currency are given by the containing row.
+		Amount            *DecimalValue            `json:"amount"`
+		Basis             TradeCostsEstimatedBasis `json:"basis"`
+		PolicyContentHash *string                  `json:"policy_content_hash"`
+		PolicyVersion     *string                  `json:"policy_version"`
+		RateSource        *string                  `json:"rate_source"`
+	} `json:"estimated"`
+	EstimatedReason *TradeCostsEstimatedReason `json:"estimated_reason,omitempty"`
+	Recorded        *struct {
+		Currency *string `json:"currency"`
+
+		// Fee Exact decimal string; no float conversion. Unit and currency are given by the containing row.
+		Fee            *DecimalValue `json:"fee"`
+		FeeIncludesTax bool          `json:"fee_includes_tax"`
+
+		// Tax Exact decimal string; no float conversion. Unit and currency are given by the containing row.
+		Tax *DecimalValue `json:"tax"`
+	} `json:"recorded"`
+	RecordedReason *TradeCostsRecordedReason `json:"recorded_reason,omitempty"`
+}
+
+// TradeCostsEstimatedBasis defines model for TradeCosts.Estimated.Basis.
+type TradeCostsEstimatedBasis string
+
+// TradeCostsEstimatedReason defines model for TradeCosts.EstimatedReason.
+type TradeCostsEstimatedReason string
+
+// TradeCostsRecordedReason defines model for TradeCosts.RecordedReason.
+type TradeCostsRecordedReason string
+
 // TradeReviewRow defines model for TradeReviewRow.
 type TradeReviewRow struct {
 	CreatedAt             *time.Time             `json:"created_at"`
@@ -782,19 +1486,30 @@ type TradeReviewRow struct {
 // TradeReviewRowPnlClass defines model for TradeReviewRow.PnlClass.
 type TradeReviewRowPnlClass string
 
-// TradeRow defines model for TradeRow.
+// TradeRow The optional decision_ref, decision_link_basis, link_reason, fill_time_basis and costs are present only with a value. decision_ref is the decision stored on the trade's retrospectives (recorded), or, with none stored, the one derived through the retrospective's correlation and the order's send attempts (inference, never stored); several decisions or orders give no link (ambiguous_decision, ambiguous_attempts). fill_time_basis and costs describe the ledger fills of the orders recorded for the trade.
 type TradeRow struct {
 	Basis    EvidenceBasis `json:"basis"`
+	Costs    *TradeCosts   `json:"costs,omitempty"`
 	Currency *string       `json:"currency"`
-	EntryAt  *time.Time    `json:"entry_at"`
+
+	// DecisionLinkBasis How a link was made. recorded is an exact key a writer stored at its own event; inference is a heuristic, or a stored key without proof that the order was sent.
+	DecisionLinkBasis *LinkBasis `json:"decision_link_basis,omitempty"`
+	DecisionRef       *string    `json:"decision_ref,omitempty"`
+	EntryAt           *time.Time `json:"entry_at"`
 
 	// EntryPrice Exact decimal string; no float conversion. Unit and currency are given by the containing row.
 	EntryPrice *DecimalValue `json:"entry_price"`
 	ExitAt     *time.Time    `json:"exit_at"`
 
 	// ExitPrice Exact decimal string; no float conversion. Unit and currency are given by the containing row.
-	ExitPrice  *DecimalValue   `json:"exit_price"`
-	ExitReason *string         `json:"exit_reason"`
+	ExitPrice  *DecimalValue `json:"exit_price"`
+	ExitReason *string       `json:"exit_reason"`
+
+	// FillTimeBasis Weakest time basis among the ledger fills of the trade's recorded orders: broker_fill_time, broker_order_time (the order time stood in for the fill time) or observed_at. Absent when no fill is found or a fill's basis is unknown.
+	FillTimeBasis *TradeRowFillTimeBasis `json:"fill_time_basis,omitempty"`
+
+	// LinkReason Closed code for a missing or weakened link. ambiguous_attempts - the live send attempts of one order key belong to several decisions. attempt_unconfirmed - one decision, but no sent outcome was recorded. no_candidate_ref, candidate_outside_trading_day, candidate_ref_unresolved - why a proposal has no candidate link. ambiguous_decision, no_decision_link - why a trade has no decision link. attempts_unavailable - the send-attempt read failed or was cut off, so no link was concluded.
+	LinkReason *LinkReason     `json:"link_reason,omitempty"`
 	Market     *TradeRowMarket `json:"market"`
 
 	// Quantity Exact decimal string; no float conversion. Unit and currency are given by the containing row.
@@ -812,6 +1527,9 @@ type TradeRow struct {
 	Symbol     *string          `json:"symbol"`
 	TradeRef   *string          `json:"trade_ref"`
 }
+
+// TradeRowFillTimeBasis Weakest time basis among the ledger fills of the trade's recorded orders: broker_fill_time, broker_order_time (the order time stood in for the fill time) or observed_at. Absent when no fill is found or a fill's basis is unknown.
+type TradeRowFillTimeBasis string
 
 // TradeRowMarket defines model for TradeRow.Market.
 type TradeRowMarket string
@@ -878,6 +1596,19 @@ type RetroDayParams struct {
 	Limit  *int               `form:"limit,omitempty" json:"limit,omitempty"`
 	Cursor *string            `form:"cursor,omitempty" json:"cursor,omitempty"`
 }
+
+// RetroDecisionsParams defines parameters for RetroDecisions.
+type RetroDecisionsParams struct {
+	From   openapi_types.Date          `form:"from" json:"from"`
+	To     openapi_types.Date          `form:"to" json:"to"`
+	Market *RetroDecisionsParamsMarket `form:"market,omitempty" json:"market,omitempty"`
+	Symbol *string                     `form:"symbol,omitempty" json:"symbol,omitempty"`
+	Limit  *int                        `form:"limit,omitempty" json:"limit,omitempty"`
+	Cursor *string                     `form:"cursor,omitempty" json:"cursor,omitempty"`
+}
+
+// RetroDecisionsParamsMarket defines parameters for RetroDecisions.
+type RetroDecisionsParamsMarket string
 
 // RetroFunnelParams defines parameters for RetroFunnel.
 type RetroFunnelParams struct {
@@ -1025,6 +1756,11 @@ type ClientInterface interface {
 	// Count and rows share one read-only snapshot.
 	RetroDay(ctx context.Context, params *RetroDayParams, reqEditors ...RequestEditorFn) (*http.Response, error)
 
+	// RetroDecisions performs a GET /trading/api/retro/v1/retro_decisions (the `RetroDecisions` operationId) request.
+	//
+	// One row per recorded decision (review.decision_evidence) whose decided_at falls in the KST date window, at most 366 days. Values come only from recorded rows: null means not derivable and carries a closed reason — never zero. mfe and mae report each horizon (1, 5, 20 sessions and to_exit) over completed daily sessions strictly inside the trade; entry and exit sessions are excluded. refs are opaque; no account numbers, broker order numbers or raw payloads.
+	RetroDecisions(ctx context.Context, params *RetroDecisionsParams, reqEditors ...RequestEditorFn) (*http.Response, error)
+
 	// RetroFunnel performs a GET /trading/api/retro/v1/retro_funnel (the `RetroFunnel` operationId) request.
 	//
 	// Maximum date span: 366 days inclusive. Count and rows share one read-only snapshot.
@@ -1101,6 +1837,21 @@ func (c *Client) MockExperiments(ctx context.Context, params *MockExperimentsPar
 // Count and rows share one read-only snapshot.
 func (c *Client) RetroDay(ctx context.Context, params *RetroDayParams, reqEditors ...RequestEditorFn) (*http.Response, error) {
 	req, err := NewRetroDayRequest(c.Server, params)
+	if err != nil {
+		return nil, err
+	}
+	req = req.WithContext(ctx)
+	if err := c.applyEditors(ctx, req, reqEditors); err != nil {
+		return nil, err
+	}
+	return c.Client.Do(req)
+}
+
+// RetroDecisions performs a GET /trading/api/retro/v1/retro_decisions (the `RetroDecisions` operationId) request.
+//
+// One row per recorded decision (review.decision_evidence) whose decided_at falls in the KST date window, at most 366 days. Values come only from recorded rows: null means not derivable and carries a closed reason — never zero. mfe and mae report each horizon (1, 5, 20 sessions and to_exit) over completed daily sessions strictly inside the trade; entry and exit sessions are excluded. refs are opaque; no account numbers, broker order numbers or raw payloads.
+func (c *Client) RetroDecisions(ctx context.Context, params *RetroDecisionsParams, reqEditors ...RequestEditorFn) (*http.Response, error) {
+	req, err := NewRetroDecisionsRequest(c.Server, params)
 	if err != nil {
 		return nil, err
 	}
@@ -1482,6 +2233,112 @@ func NewRetroDayRequest(server string, params *RetroDayParams) (*http.Request, e
 			for _, qp := range strings.Split(queryFrag, "&") {
 				rawQueryFragments = append(rawQueryFragments, qp)
 			}
+		}
+
+		if params.Limit != nil {
+
+			if queryFrag, err := runtime.StyleParamWithOptions("form", true, "limit", *params.Limit, runtime.StyleParamOptions{ParamLocation: runtime.ParamLocationQuery, Type: "integer", Format: ""}); err != nil {
+				return nil, err
+			} else {
+				for _, qp := range strings.Split(queryFrag, "&") {
+					rawQueryFragments = append(rawQueryFragments, qp)
+				}
+			}
+
+		}
+
+		if params.Cursor != nil {
+
+			if queryFrag, err := runtime.StyleParamWithOptions("form", true, "cursor", *params.Cursor, runtime.StyleParamOptions{ParamLocation: runtime.ParamLocationQuery, Type: "string", Format: ""}); err != nil {
+				return nil, err
+			} else {
+				for _, qp := range strings.Split(queryFrag, "&") {
+					rawQueryFragments = append(rawQueryFragments, qp)
+				}
+			}
+
+		}
+
+		if encoded := queryValues.Encode(); encoded != "" {
+			rawQueryFragments = append(rawQueryFragments, encoded)
+		}
+		queryURL.RawQuery = strings.Join(rawQueryFragments, "&")
+	}
+
+	req, err := http.NewRequest(http.MethodGet, queryURL.String(), nil)
+	if err != nil {
+		return nil, err
+	}
+
+	return req, nil
+}
+
+// NewRetroDecisionsRequest constructs an http.Request for the RetroDecisions method
+func NewRetroDecisionsRequest(server string, params *RetroDecisionsParams) (*http.Request, error) {
+	var err error
+
+	serverURL, err := url.Parse(server)
+	if err != nil {
+		return nil, err
+	}
+
+	operationPath := fmt.Sprintf("/trading/api/retro/v1/retro_decisions")
+	if operationPath[0] == '/' {
+		operationPath = "." + operationPath
+	}
+
+	queryURL, err := serverURL.Parse(operationPath)
+	if err != nil {
+		return nil, err
+	}
+
+	if params != nil {
+		// queryValues collects non-styled parameters (passthrough, JSON)
+		// that are safe to round-trip through url.Values.Encode().
+		queryValues := queryURL.Query()
+		// rawQueryFragments collects pre-encoded query fragments from
+		// styled parameters, preserving literal commas as delimiters
+		// per the OpenAPI spec (e.g. "color=blue,black,brown").
+		var rawQueryFragments []string
+
+		if queryFrag, err := runtime.StyleParamWithOptions("form", true, "from", params.From, runtime.StyleParamOptions{ParamLocation: runtime.ParamLocationQuery, Type: "string", Format: "date"}); err != nil {
+			return nil, err
+		} else {
+			for _, qp := range strings.Split(queryFrag, "&") {
+				rawQueryFragments = append(rawQueryFragments, qp)
+			}
+		}
+
+		if queryFrag, err := runtime.StyleParamWithOptions("form", true, "to", params.To, runtime.StyleParamOptions{ParamLocation: runtime.ParamLocationQuery, Type: "string", Format: "date"}); err != nil {
+			return nil, err
+		} else {
+			for _, qp := range strings.Split(queryFrag, "&") {
+				rawQueryFragments = append(rawQueryFragments, qp)
+			}
+		}
+
+		if params.Market != nil {
+
+			if queryFrag, err := runtime.StyleParamWithOptions("form", true, "market", *params.Market, runtime.StyleParamOptions{ParamLocation: runtime.ParamLocationQuery, Type: "string", Format: ""}); err != nil {
+				return nil, err
+			} else {
+				for _, qp := range strings.Split(queryFrag, "&") {
+					rawQueryFragments = append(rawQueryFragments, qp)
+				}
+			}
+
+		}
+
+		if params.Symbol != nil {
+
+			if queryFrag, err := runtime.StyleParamWithOptions("form", true, "symbol", *params.Symbol, runtime.StyleParamOptions{ParamLocation: runtime.ParamLocationQuery, Type: "string", Format: ""}); err != nil {
+				return nil, err
+			} else {
+				for _, qp := range strings.Split(queryFrag, "&") {
+					rawQueryFragments = append(rawQueryFragments, qp)
+				}
+			}
+
 		}
 
 		if params.Limit != nil {
@@ -2048,6 +2905,13 @@ type ClientWithResponsesInterface interface {
 	// Returns a wrapper object for the known response body format(s).
 	RetroDayWithResponse(ctx context.Context, params *RetroDayParams, reqEditors ...RequestEditorFn) (*RetroDayResult, error)
 
+	// RetroDecisionsWithResponse performs a GET /trading/api/retro/v1/retro_decisions (the `RetroDecisions` operationId) request.
+	//
+	// One row per recorded decision (review.decision_evidence) whose decided_at falls in the KST date window, at most 366 days. Values come only from recorded rows: null means not derivable and carries a closed reason — never zero. mfe and mae report each horizon (1, 5, 20 sessions and to_exit) over completed daily sessions strictly inside the trade; entry and exit sessions are excluded. refs are opaque; no account numbers, broker order numbers or raw payloads.
+	//
+	// Returns a wrapper object for the known response body format(s).
+	RetroDecisionsWithResponse(ctx context.Context, params *RetroDecisionsParams, reqEditors ...RequestEditorFn) (*RetroDecisionsResult, error)
+
 	// RetroFunnelWithResponse performs a GET /trading/api/retro/v1/retro_funnel (the `RetroFunnel` operationId) request.
 	//
 	// Maximum date span: 366 days inclusive. Count and rows share one read-only snapshot.
@@ -2382,6 +3246,82 @@ func (r RetroDayResult) StatusCode() int {
 
 // ContentType is a convenience method to retrieve the Content-Type value from the HTTP response headers
 func (r RetroDayResult) ContentType() string {
+	if r.HTTPResponse != nil {
+		return r.HTTPResponse.Header.Get("Content-Type")
+	}
+	return ""
+}
+
+type RetroDecisionsResult struct {
+	Body         []byte
+	HTTPResponse *http.Response
+	// JSON200 the response for an HTTP 200 `application/json` response
+	JSON200 *RetroDecisionsResponse
+	// JSON401 the response for an HTTP 401 `application/json` response
+	JSON401 *Error
+	// JSON403 the response for an HTTP 403 `application/json` response
+	JSON403 *Error
+	// JSON404 the response for an HTTP 404 `application/json` response
+	JSON404 *Error
+	// JSON422 the response for an HTTP 422 `application/json` response
+	JSON422 *Error
+	// JSON503 the response for an HTTP 503 `application/json` response
+	JSON503 *Error
+}
+
+// GetJSON200 returns the response for an HTTP 200 `application/json` response
+func (r RetroDecisionsResult) GetJSON200() *RetroDecisionsResponse {
+	return r.JSON200
+}
+
+// GetJSON401 returns the response for an HTTP 401 `application/json` response
+func (r RetroDecisionsResult) GetJSON401() *Error {
+	return r.JSON401
+}
+
+// GetJSON403 returns the response for an HTTP 403 `application/json` response
+func (r RetroDecisionsResult) GetJSON403() *Error {
+	return r.JSON403
+}
+
+// GetJSON404 returns the response for an HTTP 404 `application/json` response
+func (r RetroDecisionsResult) GetJSON404() *Error {
+	return r.JSON404
+}
+
+// GetJSON422 returns the response for an HTTP 422 `application/json` response
+func (r RetroDecisionsResult) GetJSON422() *Error {
+	return r.JSON422
+}
+
+// GetJSON503 returns the response for an HTTP 503 `application/json` response
+func (r RetroDecisionsResult) GetJSON503() *Error {
+	return r.JSON503
+}
+
+// GetBody returns the raw response body bytes
+func (r RetroDecisionsResult) GetBody() []byte {
+	return r.Body
+}
+
+// Status returns HTTPResponse.Status
+func (r RetroDecisionsResult) Status() string {
+	if r.HTTPResponse != nil {
+		return r.HTTPResponse.Status
+	}
+	return http.StatusText(0)
+}
+
+// StatusCode returns HTTPResponse.StatusCode
+func (r RetroDecisionsResult) StatusCode() int {
+	if r.HTTPResponse != nil {
+		return r.HTTPResponse.StatusCode
+	}
+	return 0
+}
+
+// ContentType is a convenience method to retrieve the Content-Type value from the HTTP response headers
+func (r RetroDecisionsResult) ContentType() string {
 	if r.HTTPResponse != nil {
 		return r.HTTPResponse.Header.Get("Content-Type")
 	}
@@ -2820,6 +3760,19 @@ func (c *ClientWithResponses) RetroDayWithResponse(ctx context.Context, params *
 	return ParseRetroDayResult(rsp)
 }
 
+// RetroDecisionsWithResponse performs a GET /trading/api/retro/v1/retro_decisions (the `RetroDecisions` operationId) request.
+//
+// One row per recorded decision (review.decision_evidence) whose decided_at falls in the KST date window, at most 366 days. Values come only from recorded rows: null means not derivable and carries a closed reason — never zero. mfe and mae report each horizon (1, 5, 20 sessions and to_exit) over completed daily sessions strictly inside the trade; entry and exit sessions are excluded. refs are opaque; no account numbers, broker order numbers or raw payloads.
+//
+// Returns a wrapper object for the known response body format(s).
+func (c *ClientWithResponses) RetroDecisionsWithResponse(ctx context.Context, params *RetroDecisionsParams, reqEditors ...RequestEditorFn) (*RetroDecisionsResult, error) {
+	rsp, err := c.RetroDecisions(ctx, params, reqEditors...)
+	if err != nil {
+		return nil, err
+	}
+	return ParseRetroDecisionsResult(rsp)
+}
+
 // RetroFunnelWithResponse performs a GET /trading/api/retro/v1/retro_funnel (the `RetroFunnel` operationId) request.
 //
 // Maximum date span: 366 days inclusive. Count and rows share one read-only snapshot.
@@ -3084,6 +4037,67 @@ func ParseRetroDayResult(rsp *http.Response) (*RetroDayResult, error) {
 	switch {
 	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 200:
 		var dest RetroDayResponse
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.JSON200 = &dest
+
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 401:
+		var dest Error
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.JSON401 = &dest
+
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 403:
+		var dest Error
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.JSON403 = &dest
+
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 404:
+		var dest Error
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.JSON404 = &dest
+
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 422:
+		var dest Error
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.JSON422 = &dest
+
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 503:
+		var dest Error
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.JSON503 = &dest
+
+	}
+
+	return response, nil
+}
+
+// ParseRetroDecisionsResult parses an HTTP response from a RetroDecisionsWithResponse call
+func ParseRetroDecisionsResult(rsp *http.Response) (*RetroDecisionsResult, error) {
+	bodyBytes, err := io.ReadAll(rsp.Body)
+	defer func() { _ = rsp.Body.Close() }()
+	if err != nil {
+		return nil, err
+	}
+
+	response := &RetroDecisionsResult{
+		Body:         bodyBytes,
+		HTTPResponse: rsp,
+	}
+
+	switch {
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 200:
+		var dest RetroDecisionsResponse
 		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
 			return nil, err
 		}

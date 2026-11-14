@@ -4,10 +4,10 @@
     {
       "name": "autotrader-retro-v1",
       "source_repo": "https://github.com/mgh3326/auto_trader",
-      "source_commit": "5d3f85303ee17b593d3f9b5124e567bf6e2a20df",
+      "source_commit": "93533dc4810343f6517f741b61ee93ce54c0c927",
       "source_path": "contracts/retro/v1/openapi.yaml",
       "path": "contracts/autotrader/retro/v1/openapi.yaml",
-      "sha256": "b046f94a811b671ccc02058dbca014c36c3a9b0f81109d7899df2152ee53f0b0",
+      "sha256": "8a6e44dbb4aed049b4127cdf71e3042e1cd119ec3b06d2aa8739a20cacf5b40a",
       "examples_source_path": "contracts/retro/v1/examples",
       "examples": [
         {
@@ -40,7 +40,11 @@
         },
         {
           "path": "contracts/autotrader/retro/v1/examples/retro_day.yaml",
-          "sha256": "2a5f427699f81b71c1050c86a499a1243cd6aead51d74ee4f6cf211913c83bac"
+          "sha256": "d5ff9ffc7055cccf63bb2326e042da41c2abb4f67d2100600c8e06b57ca0ca06"
+        },
+        {
+          "path": "contracts/autotrader/retro/v1/examples/retro_decisions.yaml",
+          "sha256": "bc4eac65eca717a8cc5ef0cee72844582c4033cd306824ef5206a7a40542187f"
         },
         {
           "path": "contracts/autotrader/retro/v1/examples/retro_funnel.yaml",
@@ -60,7 +64,7 @@
         },
         {
           "path": "contracts/autotrader/retro/v1/examples/retro_trades.yaml",
-          "sha256": "c41e3beb585f3ca0ac572dc3d88b512ee3771fc5e898493fcf6324bf27986839"
+          "sha256": "d3e55470e051001d6b5e509db5f76decb014e3242a841c9567d116781cb26d6e"
         },
         {
           "path": "contracts/autotrader/retro/v1/examples/retro_trades_null_amount.yaml",

@@ -89,10 +89,11 @@ func Load(t testing.TB) map[string]Example {
 	return out
 }
 
-// Operations are the nine operations, in the contract's order.
+// Operations are the ten operations, in the contract's order.
 var Operations = []string{
 	"retro_day", "retro_symbol", "retro_funnel", "retro_scoreboard",
 	"retro_positions", "mock_experiments", "get_bars", "data_gaps", "retro_trades",
+	"retro_decisions",
 }
 
 // Request is one request the fake saw.
