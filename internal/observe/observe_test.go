@@ -271,6 +271,9 @@ func (f fakeUpstream) DataGaps(context.Context, *autotrader.DataGapsParams) (aut
 func (f fakeUpstream) RetroTrades(context.Context, *autotrader.RetroTradesParams) (autotrader.Result, error) {
 	return nil, f.err
 }
+func (f fakeUpstream) RetroDecisions(context.Context, *autotrader.RetroDecisionsParams) (autotrader.Result, error) {
+	return nil, f.err
+}
 
 func TestUpstreamFailuresAreCountedAndOnlyOperatorFaultsReported(t *testing.T) {
 	rec := &recorder{}

@@ -26,12 +26,13 @@ const (
 	labelOther   = "other"
 )
 
-// toolNames are the nine retro tools, the only values of the tool and
+// toolNames are the ten retro tools, the only values of the tool and
 // operation labels. The mcp profile table is the source of truth; a name
 // missing here is labelled "other", never added as a new value.
 var toolNames = map[string]bool{
 	"retro_day": true, "retro_symbol": true, "retro_funnel": true, "retro_scoreboard": true,
 	"retro_positions": true, "mock_experiments": true, "get_bars": true, "data_gaps": true, "retro_trades": true,
+	"retro_decisions": true,
 }
 
 // outcomeOK labels a successful upstream call. Failures are labelled with the

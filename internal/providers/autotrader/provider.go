@@ -330,3 +330,7 @@ func (p *Provider) DataGaps(ctx context.Context, q *DataGapsParams) (Result, err
 func (p *Provider) RetroTrades(ctx context.Context, q *RetroTradesParams) (Result, error) {
 	return p.call(ctx, func(ctx context.Context) (*http.Response, error) { return p.client.RetroTrades(ctx, q) })
 }
+
+func (p *Provider) RetroDecisions(ctx context.Context, q *RetroDecisionsParams) (Result, error) {
+	return p.call(ctx, func(ctx context.Context) (*http.Response, error) { return p.client.RetroDecisions(ctx, q) })
+}

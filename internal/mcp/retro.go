@@ -27,6 +27,7 @@ type Retro interface {
 	GetBars(context.Context, *autotrader.GetBarsParams) (autotrader.Result, error)
 	DataGaps(context.Context, *autotrader.DataGapsParams) (autotrader.Result, error)
 	RetroTrades(context.Context, *autotrader.RetroTradesParams) (autotrader.Result, error)
+	RetroDecisions(context.Context, *autotrader.RetroDecisionsParams) (autotrader.Result, error)
 }
 
 // errNoUpstream is what a retro tool answers when the process started without
@@ -97,6 +98,15 @@ type retroTradesIn struct {
 	Strategy *string `json:"strategy,omitempty"`
 	Limit    *int    `json:"limit,omitempty"`
 	Cursor   *string `json:"cursor,omitempty"`
+}
+
+type retroDecisionsIn struct {
+	From   string  `json:"from"`
+	To     string  `json:"to"`
+	Market *string `json:"market,omitempty"`
+	Symbol *string `json:"symbol,omitempty"`
+	Limit  *int    `json:"limit,omitempty"`
+	Cursor *string `json:"cursor,omitempty"`
 }
 
 type dataGapsIn struct {
@@ -336,6 +346,33 @@ func registerRetroTrades(s *gmcp.Server, b Retro) {
 }
 
 func intPtr(n int) *int { return &n }
+
+func registerRetroDecisions(s *gmcp.Server, b Retro) {
+	addRetroTool(s, b, "retro_decisions",
+		"One row per recorded trading decision whose decision date falls in the KST date window of at most 366 days, with its candidate, order, fill, costs, excursions and retrospective link. Each value is recorded or derived, and a missing one carries a reason."+retroNote,
+		objectSchema([]string{"from", "to"}, map[string]*jsonschema.Schema{
+			"from":   dateProp("First date of the KST window, YYYY-MM-DD."),
+			"to":     dateProp("Last date of the KST window, YYYY-MM-DD."),
+			"market": marketProp(),
+			"symbol": &jsonschema.Schema{Type: "string", Pattern: `^[A-Za-z0-9_.:/\-]{1,32}$`, Description: "Symbol."},
+		}),
+		func(ctx context.Context, b Retro, in retroDecisionsIn) (autotrader.Result, error) {
+			from, err := parseDate("from", in.From)
+			if err != nil {
+				return nil, err
+			}
+			to, err := parseDate("to", in.To)
+			if err != nil {
+				return nil, err
+			}
+			var market *autotrader.RetroDecisionsParamsMarket
+			if in.Market != nil {
+				v := autotrader.RetroDecisionsParamsMarket(*in.Market)
+				market = &v
+			}
+			return b.RetroDecisions(ctx, &autotrader.RetroDecisionsParams{From: from, To: to, Market: market, Symbol: in.Symbol, Limit: in.Limit, Cursor: in.Cursor})
+		})
+}
 
 func registerDataGaps(s *gmcp.Server, b Retro) {
 	addRetroTool(s, b, "data_gaps",
