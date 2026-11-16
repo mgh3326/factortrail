@@ -30,10 +30,12 @@ jobs:
         env:
           GHCR_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: echo "$GHCR_TOKEN" | docker login ghcr.io --username "${GITHUB_ACTOR}" --password-stdin
+      - name: Create a multi-platform builder
+        run: docker buildx create --use --driver docker-container
       - name: Build and push the immutable image
         env:
           IMAGE: ghcr.io/${{ github.repository_owner }}/factortrail:sha-${{ github.sha }}
-        run: docker buildx build --push --platform linux/amd64 --build-arg REVISION="${GITHUB_SHA}" --tag "$IMAGE" .
+        run: docker buildx build --push --platform linux/amd64,linux/arm64 --build-arg REVISION="${GITHUB_SHA}" --tag "$IMAGE" .
       - name: Surface the pushed digest
         env:
           IMAGE: ghcr.io/${{ github.repository_owner }}/factortrail:sha-${{ github.sha }}

@@ -1,8 +1,10 @@
 # syntax=docker/dockerfile:1
 
-FROM golang:1.27.0-bookworm AS build
+FROM --platform=$BUILDPLATFORM golang:1.27.0-bookworm AS build
 
 ARG REVISION=unknown
+ARG TARGETOS
+ARG TARGETARCH
 
 WORKDIR /src
 
@@ -14,7 +16,7 @@ RUN go mod download
 COPY cmd ./cmd
 COPY internal ./internal
 
-RUN CGO_ENABLED=0 go build -trimpath -ldflags="-s -w -buildid= -X main.revision=${REVISION}" -o /out/factortrail ./cmd/factortrail
+RUN CGO_ENABLED=0 GOOS=${TARGETOS} GOARCH=${TARGETARCH} go build -trimpath -ldflags="-s -w -buildid= -X main.revision=${REVISION}" -o /out/factortrail ./cmd/factortrail
 
 FROM gcr.io/distroless/static-debian12:nonroot
 
