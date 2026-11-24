@@ -38,6 +38,138 @@ func (e BarRowMarket) Valid() bool {
 	}
 }
 
+// Defines values for BarRowSessionSegment.
+const (
+	KRXAFTER   BarRowSessionSegment = "KRX_AFTER"
+	KRXREGULAR BarRowSessionSegment = "KRX_REGULAR"
+	NXTOVERLAP BarRowSessionSegment = "NXT_OVERLAP"
+	NXTPOST    BarRowSessionSegment = "NXT_POST"
+	NXTPRE     BarRowSessionSegment = "NXT_PRE"
+	UNKNOWN    BarRowSessionSegment = "UNKNOWN"
+	USDAY      BarRowSessionSegment = "US_DAY"
+	USPOST     BarRowSessionSegment = "US_POST"
+	USPRE      BarRowSessionSegment = "US_PRE"
+	USREGULAR  BarRowSessionSegment = "US_REGULAR"
+)
+
+// Valid indicates whether the value is a known member of the BarRowSessionSegment enum.
+func (e BarRowSessionSegment) Valid() bool {
+	switch e {
+	case KRXAFTER:
+		return true
+	case KRXREGULAR:
+		return true
+	case NXTOVERLAP:
+		return true
+	case NXTPOST:
+		return true
+	case NXTPRE:
+		return true
+	case UNKNOWN:
+		return true
+	case USDAY:
+		return true
+	case USPOST:
+		return true
+	case USPRE:
+		return true
+	case USREGULAR:
+		return true
+	default:
+		return false
+	}
+}
+
+// Defines values for BlockReason.
+const (
+	AutoApproveDemoted    BlockReason = "auto_approve_demoted"
+	AwaitingHumanApproval BlockReason = "awaiting_human_approval"
+	CalendarUnknown       BlockReason = "calendar_unknown"
+	DeferredSessionClosed BlockReason = "deferred_session_closed"
+	DeniedByOperator      BlockReason = "denied_by_operator"
+	DuplicateIntent       BlockReason = "duplicate_intent"
+	ExpiredValidUntil     BlockReason = "expired_valid_until"
+	InvalidValidUntil     BlockReason = "invalid_valid_until"
+	NoExecutableWindow    BlockReason = "no_executable_window"
+	RejectedBroker        BlockReason = "rejected_broker"
+	RejectedPolicyGuard   BlockReason = "rejected_policy_guard"
+	Superseded            BlockReason = "superseded"
+	Voided                BlockReason = "voided"
+)
+
+// Valid indicates whether the value is a known member of the BlockReason enum.
+func (e BlockReason) Valid() bool {
+	switch e {
+	case AutoApproveDemoted:
+		return true
+	case AwaitingHumanApproval:
+		return true
+	case CalendarUnknown:
+		return true
+	case DeferredSessionClosed:
+		return true
+	case DeniedByOperator:
+		return true
+	case DuplicateIntent:
+		return true
+	case ExpiredValidUntil:
+		return true
+	case InvalidValidUntil:
+		return true
+	case NoExecutableWindow:
+		return true
+	case RejectedBroker:
+		return true
+	case RejectedPolicyGuard:
+		return true
+	case Superseded:
+		return true
+	case Voided:
+		return true
+	default:
+		return false
+	}
+}
+
+// Defines values for ChainRowBlockReasonBasis.
+const (
+	ChainRowBlockReasonBasisInference ChainRowBlockReasonBasis = "inference"
+	ChainRowBlockReasonBasisRecorded  ChainRowBlockReasonBasis = "recorded"
+)
+
+// Valid indicates whether the value is a known member of the ChainRowBlockReasonBasis enum.
+func (e ChainRowBlockReasonBasis) Valid() bool {
+	switch e {
+	case ChainRowBlockReasonBasisInference:
+		return true
+	case ChainRowBlockReasonBasisRecorded:
+		return true
+	default:
+		return false
+	}
+}
+
+// Defines values for ChainRowFillTimeBasis.
+const (
+	ChainRowFillTimeBasisBrokerFillTime  ChainRowFillTimeBasis = "broker_fill_time"
+	ChainRowFillTimeBasisBrokerOrderTime ChainRowFillTimeBasis = "broker_order_time"
+	ChainRowFillTimeBasisObservedAt      ChainRowFillTimeBasis = "observed_at"
+)
+
+// Valid indicates whether the value is a known member of the ChainRowFillTimeBasis enum.
+func (e ChainRowFillTimeBasis) Valid() bool {
+	switch e {
+	case ChainRowFillTimeBasisBrokerFillTime:
+		return true
+	case ChainRowFillTimeBasisBrokerOrderTime:
+		return true
+	case ChainRowFillTimeBasisObservedAt:
+		return true
+	default:
+		return false
+	}
+}
+
 // Defines values for ChainRowStage.
 const (
 	ChainRowStageCandidate ChainRowStage = "candidate"
@@ -100,6 +232,8 @@ const (
 	DecisionReasonNotApplicable              DecisionReason = "not_applicable"
 	DecisionReasonNotProvided                DecisionReason = "not_provided"
 	DecisionReasonRateUnavailable            DecisionReason = "rate_unavailable"
+	DecisionReasonSellDecision               DecisionReason = "sell_decision"
+	DecisionReasonSideNotRecorded            DecisionReason = "side_not_recorded"
 	DecisionReasonStopNotBelowReferencePrice DecisionReason = "stop_not_below_reference_price"
 	DecisionReasonWindowOpen                 DecisionReason = "window_open"
 )
@@ -160,6 +294,10 @@ func (e DecisionReason) Valid() bool {
 	case DecisionReasonNotProvided:
 		return true
 	case DecisionReasonRateUnavailable:
+		return true
+	case DecisionReasonSellDecision:
+		return true
+	case DecisionReasonSideNotRecorded:
 		return true
 	case DecisionReasonStopNotBelowReferencePrice:
 		return true
@@ -476,6 +614,69 @@ func (e ExcursionStatus) Valid() bool {
 	}
 }
 
+// Defines values for FunnelRowAccountMode.
+const (
+	Live FunnelRowAccountMode = "live"
+)
+
+// Valid indicates whether the value is a known member of the FunnelRowAccountMode enum.
+func (e FunnelRowAccountMode) Valid() bool {
+	switch e {
+	case Live:
+		return true
+	default:
+		return false
+	}
+}
+
+// Defines values for FunnelRowBrokers.
+const (
+	Kis   FunnelRowBrokers = "kis"
+	Toss  FunnelRowBrokers = "toss"
+	Upbit FunnelRowBrokers = "upbit"
+)
+
+// Valid indicates whether the value is a known member of the FunnelRowBrokers enum.
+func (e FunnelRowBrokers) Valid() bool {
+	switch e {
+	case Kis:
+		return true
+	case Toss:
+		return true
+	case Upbit:
+		return true
+	default:
+		return false
+	}
+}
+
+// Defines values for FunnelRowDateBasis.
+const (
+	CandidateRecordedAtKst FunnelRowDateBasis = "candidate_recorded_at_kst"
+	FillFilledAtKst        FunnelRowDateBasis = "fill_filled_at_kst"
+	ForecastCreatedKst     FunnelRowDateBasis = "forecast_created_kst"
+	OrderTradeDateKst      FunnelRowDateBasis = "order_trade_date_kst"
+	ProposalCreatedKst     FunnelRowDateBasis = "proposal_created_kst"
+)
+
+// Valid indicates whether the value is a known member of the FunnelRowDateBasis enum.
+func (e FunnelRowDateBasis) Valid() bool {
+	switch e {
+	case CandidateRecordedAtKst:
+		return true
+	case FillFilledAtKst:
+		return true
+	case ForecastCreatedKst:
+		return true
+	case OrderTradeDateKst:
+		return true
+	case ProposalCreatedKst:
+		return true
+	default:
+		return false
+	}
+}
+
 // Defines values for LinkBasis.
 const (
 	LinkBasisInference   LinkBasis = "inference"
@@ -575,6 +776,81 @@ func (e PositionRowMarket) Valid() bool {
 	}
 }
 
+// Defines values for RetroTimelineRowMarket.
+const (
+	RetroTimelineRowMarketCrypto RetroTimelineRowMarket = "crypto"
+	RetroTimelineRowMarketKr     RetroTimelineRowMarket = "kr"
+	RetroTimelineRowMarketUs     RetroTimelineRowMarket = "us"
+)
+
+// Valid indicates whether the value is a known member of the RetroTimelineRowMarket enum.
+func (e RetroTimelineRowMarket) Valid() bool {
+	switch e {
+	case RetroTimelineRowMarketCrypto:
+		return true
+	case RetroTimelineRowMarketKr:
+		return true
+	case RetroTimelineRowMarketUs:
+		return true
+	default:
+		return false
+	}
+}
+
+// Defines values for RetroTimelineRowMinuteBarsReason.
+const (
+	RetroTimelineRowMinuteBarsReasonSourceUnavailable RetroTimelineRowMinuteBarsReason = "source_unavailable"
+	RetroTimelineRowMinuteBarsReasonUnsupportedMarket RetroTimelineRowMinuteBarsReason = "unsupported_market"
+)
+
+// Valid indicates whether the value is a known member of the RetroTimelineRowMinuteBarsReason enum.
+func (e RetroTimelineRowMinuteBarsReason) Valid() bool {
+	switch e {
+	case RetroTimelineRowMinuteBarsReasonSourceUnavailable:
+		return true
+	case RetroTimelineRowMinuteBarsReasonUnsupportedMarket:
+		return true
+	default:
+		return false
+	}
+}
+
+// Defines values for RetroTimelineRowState.
+const (
+	RetroTimelineRowStateAdmittedHeld         RetroTimelineRowState = "admitted_held"
+	RetroTimelineRowStateAdmittedNoRecord     RetroTimelineRowState = "admitted_no_record"
+	RetroTimelineRowStateCandidateNotAdmitted RetroTimelineRowState = "candidate_not_admitted"
+	RetroTimelineRowStateLessThannil          RetroTimelineRowState = "<nil>"
+	RetroTimelineRowStateNotObserved          RetroTimelineRowState = "not_observed"
+	RetroTimelineRowStateObservedOnly         RetroTimelineRowState = "observed_only"
+	RetroTimelineRowStateProposedFilled       RetroTimelineRowState = "proposed_filled"
+	RetroTimelineRowStateProposedUnfilled     RetroTimelineRowState = "proposed_unfilled"
+)
+
+// Valid indicates whether the value is a known member of the RetroTimelineRowState enum.
+func (e RetroTimelineRowState) Valid() bool {
+	switch e {
+	case RetroTimelineRowStateAdmittedHeld:
+		return true
+	case RetroTimelineRowStateAdmittedNoRecord:
+		return true
+	case RetroTimelineRowStateCandidateNotAdmitted:
+		return true
+	case RetroTimelineRowStateLessThannil:
+		return true
+	case RetroTimelineRowStateNotObserved:
+		return true
+	case RetroTimelineRowStateObservedOnly:
+		return true
+	case RetroTimelineRowStateProposedFilled:
+		return true
+	case RetroTimelineRowStateProposedUnfilled:
+		return true
+	default:
+		return false
+	}
+}
+
 // Defines values for ScoreRowBasis.
 const (
 	HoldingsOnly  ScoreRowBasis = "holdings_only"
@@ -611,6 +887,102 @@ func (e ScoreRowScope) Valid() bool {
 	case Market:
 		return true
 	case Sleeve:
+		return true
+	default:
+		return false
+	}
+}
+
+// Defines values for TimelineCoverageMinuteBarsStatus.
+const (
+	TimelineCoverageMinuteBarsStatusAvailable         TimelineCoverageMinuteBarsStatus = "available"
+	TimelineCoverageMinuteBarsStatusSourceUnavailable TimelineCoverageMinuteBarsStatus = "source_unavailable"
+	TimelineCoverageMinuteBarsStatusUnsupportedMarket TimelineCoverageMinuteBarsStatus = "unsupported_market"
+)
+
+// Valid indicates whether the value is a known member of the TimelineCoverageMinuteBarsStatus enum.
+func (e TimelineCoverageMinuteBarsStatus) Valid() bool {
+	switch e {
+	case TimelineCoverageMinuteBarsStatusAvailable:
+		return true
+	case TimelineCoverageMinuteBarsStatusSourceUnavailable:
+		return true
+	case TimelineCoverageMinuteBarsStatusUnsupportedMarket:
+		return true
+	default:
+		return false
+	}
+}
+
+// Defines values for TimelineCoverageObservationLogStatus.
+const (
+	TimelineCoverageObservationLogStatusObservationLogNotRunning TimelineCoverageObservationLogStatus = "observation_log_not_running"
+	TimelineCoverageObservationLogStatusRunsRecorded             TimelineCoverageObservationLogStatus = "runs_recorded"
+	TimelineCoverageObservationLogStatusSourceUnavailable        TimelineCoverageObservationLogStatus = "source_unavailable"
+	TimelineCoverageObservationLogStatusUnsupportedMarket        TimelineCoverageObservationLogStatus = "unsupported_market"
+)
+
+// Valid indicates whether the value is a known member of the TimelineCoverageObservationLogStatus enum.
+func (e TimelineCoverageObservationLogStatus) Valid() bool {
+	switch e {
+	case TimelineCoverageObservationLogStatusObservationLogNotRunning:
+		return true
+	case TimelineCoverageObservationLogStatusRunsRecorded:
+		return true
+	case TimelineCoverageObservationLogStatusSourceUnavailable:
+		return true
+	case TimelineCoverageObservationLogStatusUnsupportedMarket:
+		return true
+	default:
+		return false
+	}
+}
+
+// Defines values for TimelineCoveragePickLogStatus.
+const (
+	TimelineCoveragePickLogStatusCallsRecorded     TimelineCoveragePickLogStatus = "calls_recorded"
+	TimelineCoveragePickLogStatusNoCalls           TimelineCoveragePickLogStatus = "no_calls"
+	TimelineCoveragePickLogStatusSourceUnavailable TimelineCoveragePickLogStatus = "source_unavailable"
+)
+
+// Valid indicates whether the value is a known member of the TimelineCoveragePickLogStatus enum.
+func (e TimelineCoveragePickLogStatus) Valid() bool {
+	switch e {
+	case TimelineCoveragePickLogStatusCallsRecorded:
+		return true
+	case TimelineCoveragePickLogStatusNoCalls:
+		return true
+	case TimelineCoveragePickLogStatusSourceUnavailable:
+		return true
+	default:
+		return false
+	}
+}
+
+// Defines values for TimelineEventSource.
+const (
+	TimelineEventSourceDecision       TimelineEventSource = "decision"
+	TimelineEventSourceFill           TimelineEventSource = "fill"
+	TimelineEventSourceObservationLog TimelineEventSource = "observation_log"
+	TimelineEventSourceOrder          TimelineEventSource = "order"
+	TimelineEventSourcePickLog        TimelineEventSource = "pick_log"
+	TimelineEventSourceProposal       TimelineEventSource = "proposal"
+)
+
+// Valid indicates whether the value is a known member of the TimelineEventSource enum.
+func (e TimelineEventSource) Valid() bool {
+	switch e {
+	case TimelineEventSourceDecision:
+		return true
+	case TimelineEventSourceFill:
+		return true
+	case TimelineEventSourceObservationLog:
+		return true
+	case TimelineEventSourceOrder:
+		return true
+	case TimelineEventSourcePickLog:
+		return true
+	case TimelineEventSourceProposal:
 		return true
 	default:
 		return false
@@ -881,6 +1253,27 @@ func (e RetroSymbolParamsMarket) Valid() bool {
 	}
 }
 
+// Defines values for RetroTimelineParamsMarket.
+const (
+	RetroTimelineParamsMarketCrypto RetroTimelineParamsMarket = "crypto"
+	RetroTimelineParamsMarketKr     RetroTimelineParamsMarket = "kr"
+	RetroTimelineParamsMarketUs     RetroTimelineParamsMarket = "us"
+)
+
+// Valid indicates whether the value is a known member of the RetroTimelineParamsMarket enum.
+func (e RetroTimelineParamsMarket) Valid() bool {
+	switch e {
+	case RetroTimelineParamsMarketCrypto:
+		return true
+	case RetroTimelineParamsMarketKr:
+		return true
+	case RetroTimelineParamsMarketUs:
+		return true
+	default:
+		return false
+	}
+}
+
 // Defines values for RetroTradesParamsMarket.
 const (
 	RetroTradesParamsMarketCrypto RetroTradesParamsMarket = "crypto"
@@ -913,6 +1306,12 @@ type BarRow struct {
 	// Currency Code or opaque reference only; no raw exception or broker message.
 	Currency string `json:"currency"`
 
+	// FirstReceivedAt First receipt time (research retrieved_at) of a kr/us 1m bar. Absent when the row came from a backfill/promotion batch.
+	FirstReceivedAt *time.Time `json:"first_received_at,omitempty"`
+
+	// FirstReceivedReason Present only when first_received_at is absent on a kr/us 1m bar.
+	FirstReceivedReason *UnknownReason `json:"first_received_reason,omitempty"`
+
 	// HighPrice Exact decimal string; no float conversion. Unit and currency are given by the containing row.
 	HighPrice *DecimalValue `json:"high_price"`
 
@@ -929,6 +1328,9 @@ type BarRow struct {
 	// Quantity Exact decimal string; no float conversion. Unit and currency are given by the containing row.
 	Quantity *DecimalValue `json:"quantity"`
 
+	// SessionSegment Session label of a kr/us 1m bar (research table). Absent for other bars.
+	SessionSegment *BarRowSessionSegment `json:"session_segment,omitempty"`
+
 	// Source Code or opaque reference only; no raw exception or broker message.
 	Source *string `json:"source"`
 
@@ -939,12 +1341,21 @@ type BarRow struct {
 	// Unit Code or opaque reference only; no raw exception or broker message.
 	Unit string `json:"unit"`
 
+	// Value Per-bar traded value of a kr/us 1m bar, exact decimal. Absent (never 0) when storage holds NULL; value_reason says why.
+	Value *string `json:"value,omitempty"`
+
+	// ValueReason Present only when value is absent on a kr/us 1m bar.
+	ValueReason *UnknownReason `json:"value_reason,omitempty"`
+
 	// Venue Code or opaque reference only; no raw exception or broker message.
 	Venue *string `json:"venue"`
 }
 
 // BarRowMarket Market actually read, selected explicitly or inferred from symbol.
 type BarRowMarket string
+
+// BarRowSessionSegment Session label of a kr/us 1m bar (research table). Absent for other bars.
+type BarRowSessionSegment string
 
 // Benchmark defines model for Benchmark.
 type Benchmark struct {
@@ -958,9 +1369,16 @@ type Benchmark struct {
 	UnknownReason *UnknownReason `json:"unknown_reason"`
 }
 
-// ChainRow Order rows originate from live broker order ledgers, including direct orders. An unambiguous order links to its rung; fills link to their ledger order. Order statuses are filled, partially_filled, working, cancelled, expired, rejected, and unresolved. Authoritative fills take precedence, followed by broker terminal status, then the linked rung expiry inference; a current-day open order is working and an older one without terminal evidence is unresolved. Rejection reasons are rate_limited, price_limit, insufficient_balance, market_closed, invalid_order, or broker_other. Expiry reasons are day_order_expired or expired_inference_no_broker_original; cancellation uses cancelled and unresolved uses no_terminal_evidence. The optional link fields are present only with a value. link_basis says how linked_ref was made; decision_ref is the decision a proposal, rung or order descends from and decision_link_basis how that was made. An order whose send key has attempts of one decision links to that decision (recorded with a sent outcome, otherwise inference with attempt_unconfirmed); attempts of several decisions give no link (ambiguous_attempts); with no attempt the rung match applies (idempotency key recorded, correlation only inference). A proposal links to the candidate its decision names; one without a decision links to an earlier candidate of the same KST day only (inference).
+// BlockReason Why a proposal or rung has not been submitted, derived from stored columns only. awaiting_human_approval - an approval card went to a person and is unanswered. auto_approve_demoted - auto-approve was evaluated and refused, so the order waits for a person. deferred_session_closed, no_executable_window, calendar_unknown, invalid_valid_until - the approval-window verdict that stopped the last card dispatch. expired_valid_until - the order expired before it was sent. voided, superseded - the proposal or rung was voided or replaced. denied_by_operator - a person denied it. rejected_policy_guard - a policy guard rejected the rung. rejected_broker - the broker rejected or throttled it. duplicate_intent - an identical pending intent already existed. The stored reason text and any broker message are never exposed.
+type BlockReason string
+
+// ChainRow Order rows originate from live broker order ledgers, including direct orders. An unambiguous order links to its rung; fills link to their ledger order. Order statuses are filled, partially_filled, working, cancelled, expired, rejected, and unresolved. Authoritative fills take precedence, followed by broker terminal status, then the linked rung expiry inference; a current-day open order is working and an older one without terminal evidence is unresolved. Rejection reasons are rate_limited, price_limit, insufficient_balance, market_closed, invalid_order, or broker_other. Expiry reasons are day_order_expired or expired_inference_no_broker_original; cancellation uses cancelled and unresolved uses no_terminal_evidence. The optional link fields are present only with a value. link_basis says how linked_ref was made; decision_ref is the decision a proposal, rung or order descends from and decision_link_basis how that was made. An order whose send key has attempts of one decision links to that decision (recorded with a sent outcome, otherwise inference with attempt_unconfirmed); attempts of several decisions give no link (ambiguous_attempts); with no attempt the rung match applies (idempotency key recorded, correlation only inference). A proposal links to the candidate its decision names; one without a decision links to an earlier candidate of the same KST day only (inference). The optional block_reason and block_reason_basis appear only on proposal and rung rows whose stored evidence decides why the order is not submitted; recorded is a value a writer stored, inference is derived from the absence of a send. A row without such evidence has neither key.
 type ChainRow struct {
 	Basis EvidenceBasis `json:"basis"`
+
+	// BlockReason Why a proposal or rung has not been submitted, derived from stored columns only. awaiting_human_approval - an approval card went to a person and is unanswered. auto_approve_demoted - auto-approve was evaluated and refused, so the order waits for a person. deferred_session_closed, no_executable_window, calendar_unknown, invalid_valid_until - the approval-window verdict that stopped the last card dispatch. expired_valid_until - the order expired before it was sent. voided, superseded - the proposal or rung was voided or replaced. denied_by_operator - a person denied it. rejected_policy_guard - a policy guard rejected the rung. rejected_broker - the broker rejected or throttled it. duplicate_intent - an identical pending intent already existed. The stored reason text and any broker message are never exposed.
+	BlockReason      *BlockReason              `json:"block_reason,omitempty"`
+	BlockReasonBasis *ChainRowBlockReasonBasis `json:"block_reason_basis,omitempty"`
 
 	// Currency Code or opaque reference only; no raw exception or broker message.
 	Currency *string `json:"currency"`
@@ -974,6 +1392,9 @@ type ChainRow struct {
 
 	// EventRef Code or opaque reference only; no raw exception or broker message.
 	EventRef string `json:"event_ref"`
+
+	// FillTimeBasis Time basis of event_at on a fill row. Complete same-order websocket coverage supplies the latest broker fill time for an aggregate row. Otherwise the ledger row supplies the time and basis. Absent when unknown.
+	FillTimeBasis *ChainRowFillTimeBasis `json:"fill_time_basis,omitempty"`
 
 	// LinkBasis How a link was made. recorded is an exact key a writer stored at its own event; inference is a heuristic, or a stored key without proof that the order was sent.
 	LinkBasis *LinkBasis `json:"link_basis,omitempty"`
@@ -1004,6 +1425,12 @@ type ChainRow struct {
 	Unit string `json:"unit"`
 }
 
+// ChainRowBlockReasonBasis defines model for ChainRow.BlockReasonBasis.
+type ChainRowBlockReasonBasis string
+
+// ChainRowFillTimeBasis Time basis of event_at on a fill row. Complete same-order websocket coverage supplies the latest broker fill time for an aggregate row. Otherwise the ledger row supplies the time and basis. Absent when unknown.
+type ChainRowFillTimeBasis string
+
 // ChainRowStage defines model for ChainRow.Stage.
 type ChainRowStage string
 
@@ -1018,7 +1445,7 @@ type DecimalValue = string
 // DecisionReason Closed reason vocabulary for a null or weakened decision field. Combines the link reasons of ChainRow with the metric reasons of the risk, MFE/MAE and cost calculations.
 type DecisionReason string
 
-// DecisionRow One recorded decision and what was derived from it at read time. Every *_reason field is present only to explain its sibling null (or weakened) value; null reasons are not_applicable. candidate_ref is the pick the recorded candidate reference resolves to. order_states uses the chain's closed vocabulary; order_count is the number of order ledger rows whose send attempts resolve to this decision (null with attempts_unavailable when that read failed). entry_avg_price and filled_quantity are the buy fills of those orders. costs keeps broker-reported costs apart from the policy estimate. mfe/mae are daily-bar excursions (basis always inference, adjusted unknown). retrospective_ref is the stored decision_id link (recorded) or the single correlation-derived review (inference); r_multiple needs both entry and exit fills plus a known risk per unit.
+// DecisionRow One recorded decision and what was derived from it at read time. Every *_reason field is present only to explain its sibling null (or weakened) value; null reasons are not_applicable. candidate_ref is the pick the recorded candidate reference resolves to. order_states uses the chain's closed vocabulary; order_count is the number of order ledger rows whose send attempts resolve to this decision (null with attempts_unavailable when that read failed). entry_avg_price and filled_quantity are the buy fills of those orders. costs keeps broker-reported costs apart from the policy estimate. mfe/mae are daily-bar excursions (basis always inference, adjusted unknown). retrospective_ref is the stored decision_id link (recorded) or the single correlation-derived review (inference); r_multiple needs both entry and exit fills plus a known risk per unit. A sell decision reports entry_avg_price and filled_quantity as null with fill_reason sell_decision and carries its own linked sell fills in the optional sell_filled_quantity, sell_avg_price and sell_fill_reason. A declined decision that never recorded a side (stored NULL, or the historical placeholder buy with an empty rung 0) reports side null with the optional side_reason side_not_recorded.
 type DecisionRow struct {
 	Adjusted *bool         `json:"adjusted"`
 	Basis    EvidenceBasis `json:"basis"`
@@ -1115,8 +1542,20 @@ type DecisionRow struct {
 	RiskPctOfNotional *DecimalValue `json:"risk_pct_of_notional"`
 
 	// RiskReason Closed reason vocabulary for a null or weakened decision field. Combines the link reasons of ChainRow with the metric reasons of the risk, MFE/MAE and cost calculations.
-	RiskReason *DecisionReason  `json:"risk_reason"`
-	Side       *DecisionRowSide `json:"side"`
+	RiskReason *DecisionReason `json:"risk_reason"`
+
+	// SellAvgPrice Exact decimal string; no float conversion. Unit and currency are given by the containing row.
+	SellAvgPrice *DecimalValue `json:"sell_avg_price,omitempty"`
+
+	// SellFillReason Closed reason vocabulary for a null or weakened decision field. Combines the link reasons of ChainRow with the metric reasons of the risk, MFE/MAE and cost calculations.
+	SellFillReason *DecisionReason `json:"sell_fill_reason,omitempty"`
+
+	// SellFilledQuantity Exact decimal string; no float conversion. Unit and currency are given by the containing row.
+	SellFilledQuantity *DecimalValue    `json:"sell_filled_quantity,omitempty"`
+	Side               *DecisionRowSide `json:"side"`
+
+	// SideReason Closed reason vocabulary for a null or weakened decision field. Combines the link reasons of ChainRow with the metric reasons of the risk, MFE/MAE and cost calculations.
+	SideReason *DecisionReason `json:"side_reason,omitempty"`
 
 	// StopPrice Exact decimal string; no float conversion. Unit and currency are given by the containing row.
 	StopPrice *DecimalValue `json:"stop_price"`
@@ -1257,12 +1696,20 @@ type ExperimentRow struct {
 
 // FunnelRow Order and fill counts use the same ledger orders and fill rows as the chain.
 type FunnelRow struct {
-	Basis EvidenceBasis `json:"basis"`
+	// AccountMode Present only on stages that read live account populations.
+	AccountMode *FunnelRowAccountMode `json:"account_mode,omitempty"`
+	Basis       EvidenceBasis         `json:"basis"`
+
+	// Brokers Live brokers whose ledger population this stage's query selected for the market. Present with account_mode only.
+	Brokers *[]FunnelRowBrokers `json:"brokers,omitempty"`
 
 	// Cohort Code or opaque reference only; no raw exception or broker message.
-	Cohort      string `json:"cohort"`
-	Count       *int   `json:"count"`
-	Denominator *int   `json:"denominator"`
+	Cohort string `json:"cohort"`
+	Count  *int   `json:"count"`
+
+	// DateBasis The KST window column the stage was filtered on. candidate_recorded_at_kst - screener pick recorded_at. forecast_created_kst - rejected forecast created_at. proposal_created_kst - proposal created_at (rung counts use their proposal's date). order_trade_date_kst - trade_date of the live order ledgers. fill_filled_at_kst - execution_ledger filled_at.
+	DateBasis   *FunnelRowDateBasis `json:"date_basis,omitempty"`
+	Denominator *int                `json:"denominator"`
 
 	// FillRate Exact decimal string; no float conversion. Unit and currency are given by the containing row.
 	FillRate      *DecimalValue  `json:"fill_rate"`
@@ -1274,6 +1721,15 @@ type FunnelRow struct {
 	// Unit Code or opaque reference only; no raw exception or broker message.
 	Unit string `json:"unit"`
 }
+
+// FunnelRowAccountMode Present only on stages that read live account populations.
+type FunnelRowAccountMode string
+
+// FunnelRowBrokers defines model for FunnelRow.Brokers.
+type FunnelRowBrokers string
+
+// FunnelRowDateBasis The KST window column the stage was filtered on. candidate_recorded_at_kst - screener pick recorded_at. forecast_created_kst - rejected forecast created_at. proposal_created_kst - proposal created_at (rung counts use their proposal's date). order_trade_date_kst - trade_date of the live order ledgers. fill_filled_at_kst - execution_ledger filled_at.
+type FunnelRowDateBasis string
 
 // GapRow defines model for GapRow.
 type GapRow struct {
@@ -1380,6 +1836,35 @@ type RetroSymbolResponse struct {
 	Data []ChainRow `json:"data"`
 }
 
+// RetroTimelineResponse total counts the symbols in the date's population before pagination, or null with count_unavailable when a source read failed or was cut off. Page length is never total.
+type RetroTimelineResponse struct {
+	// Coverage What was recording on the date. observation_log_not_running means no run status row exists for the KST date (runs counts those rows by status); it is not proof that no snapshot exists. pick_log.calls is the number of distinct screener calls recorded that day for the market.
+	Coverage TimelineCoverage   `json:"coverage"`
+	Data     []RetroTimelineRow `json:"data"`
+}
+
+// RetroTimelineRow state is null only with reason source_unavailable. Precedence: proposed_filled/proposed_unfilled (a proposal, order, fill or proposal/direct-order decision exists; filled by the chain's fills), admitted_held (an admitted pick and a declined decision or deferred_no_action forecast; a declined record with no pick row at all reports reason declined_without_pick_record), admitted_no_record (an admitted pick and no decision record of any kind - never a hold), candidate_not_admitted (pick rows only not_admitted or dropped_preselection, reason is the recorded admission reason), observed_only (observation log first capture only, or pick rows whose admission was never recorded), not_observed (a requested symbol in no source). minute_bars is null with minute_bars_reason when unread.
+type RetroTimelineRow struct {
+	Events           []TimelineEvent                   `json:"events"`
+	Market           RetroTimelineRowMarket            `json:"market"`
+	MinuteBars       *[]TimelineMinuteBars             `json:"minute_bars"`
+	MinuteBarsReason *RetroTimelineRowMinuteBarsReason `json:"minute_bars_reason,omitempty"`
+
+	// Reason Code or opaque reference only; no raw exception or broker message.
+	Reason string                 `json:"reason"`
+	State  *RetroTimelineRowState `json:"state"`
+	Symbol string                 `json:"symbol"`
+}
+
+// RetroTimelineRowMarket defines model for RetroTimelineRow.Market.
+type RetroTimelineRowMarket string
+
+// RetroTimelineRowMinuteBarsReason defines model for RetroTimelineRow.MinuteBarsReason.
+type RetroTimelineRowMinuteBarsReason string
+
+// RetroTimelineRowState defines model for RetroTimelineRow.State.
+type RetroTimelineRowState string
+
 // RetroTradesResponse defines model for RetroTradesResponse.
 type RetroTradesResponse struct {
 	Data    []TradeRow   `json:"data"`
@@ -1429,6 +1914,62 @@ type ScoreRowBasis string
 
 // ScoreRowScope defines model for ScoreRow.Scope.
 type ScoreRowScope string
+
+// TimelineCoverage What was recording on the date. observation_log_not_running means no run status row exists for the KST date (runs counts those rows by status); it is not proof that no snapshot exists. pick_log.calls is the number of distinct screener calls recorded that day for the market.
+type TimelineCoverage struct {
+	MinuteBars struct {
+		Status TimelineCoverageMinuteBarsStatus `json:"status"`
+	} `json:"minute_bars"`
+	ObservationLog struct {
+		Runs *struct {
+			Empty int `json:"empty"`
+			Error int `json:"error"`
+			Ok    int `json:"ok"`
+		} `json:"runs"`
+		Status TimelineCoverageObservationLogStatus `json:"status"`
+	} `json:"observation_log"`
+	PickLog struct {
+		Calls  *int                          `json:"calls"`
+		Status TimelineCoveragePickLogStatus `json:"status"`
+	} `json:"pick_log"`
+}
+
+// TimelineCoverageMinuteBarsStatus defines model for TimelineCoverage.MinuteBars.Status.
+type TimelineCoverageMinuteBarsStatus string
+
+// TimelineCoverageObservationLogStatus defines model for TimelineCoverage.ObservationLog.Status.
+type TimelineCoverageObservationLogStatus string
+
+// TimelineCoveragePickLogStatus defines model for TimelineCoverage.PickLog.Status.
+type TimelineCoveragePickLogStatus string
+
+// TimelineEvent One piece of evidence. kind and reason are closed codes copied from the source vocabularies (pick log admission and reason, decision kind, the chain's proposal/order/fill status and reason, the ranking surface of an observation); never raw text. ref is the opaque ref the same record has in retro_day or retro_decisions; the observation log has none.
+type TimelineEvent struct {
+	At time.Time `json:"at"`
+
+	// Kind Code or opaque reference only; no raw exception or broker message.
+	Kind string `json:"kind"`
+
+	// Reason Code or opaque reference only; no raw exception or broker message.
+	Reason *string `json:"reason"`
+
+	// Ref Code or opaque reference only; no raw exception or broker message.
+	Ref    *string             `json:"ref"`
+	Source TimelineEventSource `json:"source"`
+}
+
+// TimelineEventSource defines model for TimelineEvent.Source.
+type TimelineEventSource string
+
+// TimelineMinuteBars Stored one-minute bars of the symbol on the date for one venue: row count and the start of the first and last bar. No prices.
+type TimelineMinuteBars struct {
+	FirstBarAt time.Time `json:"first_bar_at"`
+	LastBarAt  time.Time `json:"last_bar_at"`
+	Rows       int       `json:"rows"`
+
+	// Venue Code or opaque reference only; no raw exception or broker message.
+	Venue string `json:"venue"`
+}
 
 // TradeCosts Costs of the ledger fills of the orders recorded for the trade. recorded is what the broker reported and is null (with recorded_reason) when any fill did not provide it; a fee of a fill with fee_basis not_provided is never a recorded zero. fee_includes_tax is true when a fill predates the split of Toss commission and tax and its fee is their sum. estimated is policy round_trip_cost_bps over the entry notional, never mixed into recorded. The reasons are present only when their side is null.
 type TradeCosts struct {
@@ -1649,6 +2190,18 @@ type RetroSymbolParams struct {
 // RetroSymbolParamsMarket defines parameters for RetroSymbol.
 type RetroSymbolParamsMarket string
 
+// RetroTimelineParams defines parameters for RetroTimeline.
+type RetroTimelineParams struct {
+	Market RetroTimelineParamsMarket `form:"market" json:"market"`
+	Date   openapi_types.Date        `form:"date" json:"date"`
+	Symbol *string                   `form:"symbol,omitempty" json:"symbol,omitempty"`
+	Limit  *int                      `form:"limit,omitempty" json:"limit,omitempty"`
+	Cursor *string                   `form:"cursor,omitempty" json:"cursor,omitempty"`
+}
+
+// RetroTimelineParamsMarket defines parameters for RetroTimeline.
+type RetroTimelineParamsMarket string
+
 // RetroTradesParams defines parameters for RetroTrades.
 type RetroTradesParams struct {
 	From     openapi_types.Date       `form:"from" json:"from"`
@@ -1781,6 +2334,11 @@ type ClientInterface interface {
 	// Maximum date span: 366 days inclusive. Count and rows share one read-only snapshot.
 	RetroSymbol(ctx context.Context, params *RetroSymbolParams, reqEditors ...RequestEditorFn) (*http.Response, error)
 
+	// RetroTimeline performs a GET /trading/api/retro/v1/retro_timeline (the `RetroTimeline` operationId) request.
+	//
+	// One row per symbol that appears in any evidence source for one KST date and market (or the requested symbol), with a closed state and the ordered events behind it. Sources and date basis: the observation log (first capture, trading_date; KR only), the screener pick log (recorded_at), recorded decisions and deferred_no_action forecasts (decided_at, created_at), and the chain's proposals, orders and fills — all on the KST calendar day of the request. Minute bars are counts and first/last bar start only; KR by the KST day, US by the stored ET trading day equal to the requested date. A source read that failed or was cut off makes the rows it could have changed null with reason source_unavailable — never a weaker state. coverage says what was recording that day, so not_observed is distinguishable from nothing was recording. Refs are opaque; no raw text, account numbers or broker order numbers.
+	RetroTimeline(ctx context.Context, params *RetroTimelineParams, reqEditors ...RequestEditorFn) (*http.Response, error)
+
 	// RetroTrades performs a GET /trading/api/retro/v1/retro_trades (the `RetroTrades` operationId) request.
 	//
 	// Closed live journals (account_type=live) and linked live reviews (account_mode=kis_live, toss_live, upbit_live). Dates are KST, inclusive, at most 366 days. return_rate is pnl_pct in percent. entry_at is journal creation time. Journal realized P&L prefers total_pnl_krw, then security_pnl_usd, then security_pnl_krw. Values are session-recorded inference.
@@ -1912,6 +2470,21 @@ func (c *Client) RetroScoreboard(ctx context.Context, params *RetroScoreboardPar
 // Maximum date span: 366 days inclusive. Count and rows share one read-only snapshot.
 func (c *Client) RetroSymbol(ctx context.Context, params *RetroSymbolParams, reqEditors ...RequestEditorFn) (*http.Response, error) {
 	req, err := NewRetroSymbolRequest(c.Server, params)
+	if err != nil {
+		return nil, err
+	}
+	req = req.WithContext(ctx)
+	if err := c.applyEditors(ctx, req, reqEditors); err != nil {
+		return nil, err
+	}
+	return c.Client.Do(req)
+}
+
+// RetroTimeline performs a GET /trading/api/retro/v1/retro_timeline (the `RetroTimeline` operationId) request.
+//
+// One row per symbol that appears in any evidence source for one KST date and market (or the requested symbol), with a closed state and the ordered events behind it. Sources and date basis: the observation log (first capture, trading_date; KR only), the screener pick log (recorded_at), recorded decisions and deferred_no_action forecasts (decided_at, created_at), and the chain's proposals, orders and fills — all on the KST calendar day of the request. Minute bars are counts and first/last bar start only; KR by the KST day, US by the stored ET trading day equal to the requested date. A source read that failed or was cut off makes the rows it could have changed null with reason source_unavailable — never a weaker state. coverage says what was recording that day, so not_observed is distinguishable from nothing was recording. Refs are opaque; no raw text, account numbers or broker order numbers.
+func (c *Client) RetroTimeline(ctx context.Context, params *RetroTimelineParams, reqEditors ...RequestEditorFn) (*http.Response, error) {
+	req, err := NewRetroTimelineRequest(c.Server, params)
 	if err != nil {
 		return nil, err
 	}
@@ -2727,6 +3300,100 @@ func NewRetroSymbolRequest(server string, params *RetroSymbolParams) (*http.Requ
 	return req, nil
 }
 
+// NewRetroTimelineRequest constructs an http.Request for the RetroTimeline method
+func NewRetroTimelineRequest(server string, params *RetroTimelineParams) (*http.Request, error) {
+	var err error
+
+	serverURL, err := url.Parse(server)
+	if err != nil {
+		return nil, err
+	}
+
+	operationPath := fmt.Sprintf("/trading/api/retro/v1/retro_timeline")
+	if operationPath[0] == '/' {
+		operationPath = "." + operationPath
+	}
+
+	queryURL, err := serverURL.Parse(operationPath)
+	if err != nil {
+		return nil, err
+	}
+
+	if params != nil {
+		// queryValues collects non-styled parameters (passthrough, JSON)
+		// that are safe to round-trip through url.Values.Encode().
+		queryValues := queryURL.Query()
+		// rawQueryFragments collects pre-encoded query fragments from
+		// styled parameters, preserving literal commas as delimiters
+		// per the OpenAPI spec (e.g. "color=blue,black,brown").
+		var rawQueryFragments []string
+
+		if queryFrag, err := runtime.StyleParamWithOptions("form", true, "market", params.Market, runtime.StyleParamOptions{ParamLocation: runtime.ParamLocationQuery, Type: "string", Format: ""}); err != nil {
+			return nil, err
+		} else {
+			for _, qp := range strings.Split(queryFrag, "&") {
+				rawQueryFragments = append(rawQueryFragments, qp)
+			}
+		}
+
+		if queryFrag, err := runtime.StyleParamWithOptions("form", true, "date", params.Date, runtime.StyleParamOptions{ParamLocation: runtime.ParamLocationQuery, Type: "string", Format: "date"}); err != nil {
+			return nil, err
+		} else {
+			for _, qp := range strings.Split(queryFrag, "&") {
+				rawQueryFragments = append(rawQueryFragments, qp)
+			}
+		}
+
+		if params.Symbol != nil {
+
+			if queryFrag, err := runtime.StyleParamWithOptions("form", true, "symbol", *params.Symbol, runtime.StyleParamOptions{ParamLocation: runtime.ParamLocationQuery, Type: "string", Format: ""}); err != nil {
+				return nil, err
+			} else {
+				for _, qp := range strings.Split(queryFrag, "&") {
+					rawQueryFragments = append(rawQueryFragments, qp)
+				}
+			}
+
+		}
+
+		if params.Limit != nil {
+
+			if queryFrag, err := runtime.StyleParamWithOptions("form", true, "limit", *params.Limit, runtime.StyleParamOptions{ParamLocation: runtime.ParamLocationQuery, Type: "integer", Format: ""}); err != nil {
+				return nil, err
+			} else {
+				for _, qp := range strings.Split(queryFrag, "&") {
+					rawQueryFragments = append(rawQueryFragments, qp)
+				}
+			}
+
+		}
+
+		if params.Cursor != nil {
+
+			if queryFrag, err := runtime.StyleParamWithOptions("form", true, "cursor", *params.Cursor, runtime.StyleParamOptions{ParamLocation: runtime.ParamLocationQuery, Type: "string", Format: ""}); err != nil {
+				return nil, err
+			} else {
+				for _, qp := range strings.Split(queryFrag, "&") {
+					rawQueryFragments = append(rawQueryFragments, qp)
+				}
+			}
+
+		}
+
+		if encoded := queryValues.Encode(); encoded != "" {
+			rawQueryFragments = append(rawQueryFragments, encoded)
+		}
+		queryURL.RawQuery = strings.Join(rawQueryFragments, "&")
+	}
+
+	req, err := http.NewRequest(http.MethodGet, queryURL.String(), nil)
+	if err != nil {
+		return nil, err
+	}
+
+	return req, nil
+}
+
 // NewRetroTradesRequest constructs an http.Request for the RetroTrades method
 func NewRetroTradesRequest(server string, params *RetroTradesParams) (*http.Request, error) {
 	var err error
@@ -2939,6 +3606,13 @@ type ClientWithResponsesInterface interface {
 	//
 	// Returns a wrapper object for the known response body format(s).
 	RetroSymbolWithResponse(ctx context.Context, params *RetroSymbolParams, reqEditors ...RequestEditorFn) (*RetroSymbolResult, error)
+
+	// RetroTimelineWithResponse performs a GET /trading/api/retro/v1/retro_timeline (the `RetroTimeline` operationId) request.
+	//
+	// One row per symbol that appears in any evidence source for one KST date and market (or the requested symbol), with a closed state and the ordered events behind it. Sources and date basis: the observation log (first capture, trading_date; KR only), the screener pick log (recorded_at), recorded decisions and deferred_no_action forecasts (decided_at, created_at), and the chain's proposals, orders and fills — all on the KST calendar day of the request. Minute bars are counts and first/last bar start only; KR by the KST day, US by the stored ET trading day equal to the requested date. A source read that failed or was cut off makes the rows it could have changed null with reason source_unavailable — never a weaker state. coverage says what was recording that day, so not_observed is distinguishable from nothing was recording. Refs are opaque; no raw text, account numbers or broker order numbers.
+	//
+	// Returns a wrapper object for the known response body format(s).
+	RetroTimelineWithResponse(ctx context.Context, params *RetroTimelineParams, reqEditors ...RequestEditorFn) (*RetroTimelineResult, error)
 
 	// RetroTradesWithResponse performs a GET /trading/api/retro/v1/retro_trades (the `RetroTrades` operationId) request.
 	//
@@ -3632,6 +4306,82 @@ func (r RetroSymbolResult) ContentType() string {
 	return ""
 }
 
+type RetroTimelineResult struct {
+	Body         []byte
+	HTTPResponse *http.Response
+	// JSON200 the response for an HTTP 200 `application/json` response
+	JSON200 *RetroTimelineResponse
+	// JSON401 the response for an HTTP 401 `application/json` response
+	JSON401 *Error
+	// JSON403 the response for an HTTP 403 `application/json` response
+	JSON403 *Error
+	// JSON404 the response for an HTTP 404 `application/json` response
+	JSON404 *Error
+	// JSON422 the response for an HTTP 422 `application/json` response
+	JSON422 *Error
+	// JSON503 the response for an HTTP 503 `application/json` response
+	JSON503 *Error
+}
+
+// GetJSON200 returns the response for an HTTP 200 `application/json` response
+func (r RetroTimelineResult) GetJSON200() *RetroTimelineResponse {
+	return r.JSON200
+}
+
+// GetJSON401 returns the response for an HTTP 401 `application/json` response
+func (r RetroTimelineResult) GetJSON401() *Error {
+	return r.JSON401
+}
+
+// GetJSON403 returns the response for an HTTP 403 `application/json` response
+func (r RetroTimelineResult) GetJSON403() *Error {
+	return r.JSON403
+}
+
+// GetJSON404 returns the response for an HTTP 404 `application/json` response
+func (r RetroTimelineResult) GetJSON404() *Error {
+	return r.JSON404
+}
+
+// GetJSON422 returns the response for an HTTP 422 `application/json` response
+func (r RetroTimelineResult) GetJSON422() *Error {
+	return r.JSON422
+}
+
+// GetJSON503 returns the response for an HTTP 503 `application/json` response
+func (r RetroTimelineResult) GetJSON503() *Error {
+	return r.JSON503
+}
+
+// GetBody returns the raw response body bytes
+func (r RetroTimelineResult) GetBody() []byte {
+	return r.Body
+}
+
+// Status returns HTTPResponse.Status
+func (r RetroTimelineResult) Status() string {
+	if r.HTTPResponse != nil {
+		return r.HTTPResponse.Status
+	}
+	return http.StatusText(0)
+}
+
+// StatusCode returns HTTPResponse.StatusCode
+func (r RetroTimelineResult) StatusCode() int {
+	if r.HTTPResponse != nil {
+		return r.HTTPResponse.StatusCode
+	}
+	return 0
+}
+
+// ContentType is a convenience method to retrieve the Content-Type value from the HTTP response headers
+func (r RetroTimelineResult) ContentType() string {
+	if r.HTTPResponse != nil {
+		return r.HTTPResponse.Header.Get("Content-Type")
+	}
+	return ""
+}
+
 type RetroTradesResult struct {
 	Body         []byte
 	HTTPResponse *http.Response
@@ -3823,6 +4573,19 @@ func (c *ClientWithResponses) RetroSymbolWithResponse(ctx context.Context, param
 		return nil, err
 	}
 	return ParseRetroSymbolResult(rsp)
+}
+
+// RetroTimelineWithResponse performs a GET /trading/api/retro/v1/retro_timeline (the `RetroTimeline` operationId) request.
+//
+// One row per symbol that appears in any evidence source for one KST date and market (or the requested symbol), with a closed state and the ordered events behind it. Sources and date basis: the observation log (first capture, trading_date; KR only), the screener pick log (recorded_at), recorded decisions and deferred_no_action forecasts (decided_at, created_at), and the chain's proposals, orders and fills — all on the KST calendar day of the request. Minute bars are counts and first/last bar start only; KR by the KST day, US by the stored ET trading day equal to the requested date. A source read that failed or was cut off makes the rows it could have changed null with reason source_unavailable — never a weaker state. coverage says what was recording that day, so not_observed is distinguishable from nothing was recording. Refs are opaque; no raw text, account numbers or broker order numbers.
+//
+// Returns a wrapper object for the known response body format(s).
+func (c *ClientWithResponses) RetroTimelineWithResponse(ctx context.Context, params *RetroTimelineParams, reqEditors ...RequestEditorFn) (*RetroTimelineResult, error) {
+	rsp, err := c.RetroTimeline(ctx, params, reqEditors...)
+	if err != nil {
+		return nil, err
+	}
+	return ParseRetroTimelineResult(rsp)
 }
 
 // RetroTradesWithResponse performs a GET /trading/api/retro/v1/retro_trades (the `RetroTrades` operationId) request.
@@ -4342,6 +5105,67 @@ func ParseRetroSymbolResult(rsp *http.Response) (*RetroSymbolResult, error) {
 	switch {
 	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 200:
 		var dest RetroSymbolResponse
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.JSON200 = &dest
+
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 401:
+		var dest Error
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.JSON401 = &dest
+
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 403:
+		var dest Error
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.JSON403 = &dest
+
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 404:
+		var dest Error
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.JSON404 = &dest
+
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 422:
+		var dest Error
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.JSON422 = &dest
+
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 503:
+		var dest Error
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.JSON503 = &dest
+
+	}
+
+	return response, nil
+}
+
+// ParseRetroTimelineResult parses an HTTP response from a RetroTimelineWithResponse call
+func ParseRetroTimelineResult(rsp *http.Response) (*RetroTimelineResult, error) {
+	bodyBytes, err := io.ReadAll(rsp.Body)
+	defer func() { _ = rsp.Body.Close() }()
+	if err != nil {
+		return nil, err
+	}
+
+	response := &RetroTimelineResult{
+		Body:         bodyBytes,
+		HTTPResponse: rsp,
+	}
+
+	switch {
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 200:
+		var dest RetroTimelineResponse
 		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
 			return nil, err
 		}

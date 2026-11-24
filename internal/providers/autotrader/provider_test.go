@@ -104,6 +104,9 @@ func opCalls(t *testing.T) map[string]func(*Provider, map[string]string) (Result
 		"retro_decisions": func(p *Provider, q map[string]string) (Result, error) {
 			return p.RetroDecisions(ctx, &RetroDecisionsParams{From: d(q, "from"), To: d(q, "to"), Market: (*RetroDecisionsParamsMarket)(opt(q, "market")), Symbol: opt(q, "symbol")})
 		},
+		"retro_timeline": func(p *Provider, q map[string]string) (Result, error) {
+			return p.RetroTimeline(ctx, &RetroTimelineParams{Market: RetroTimelineParamsMarket(q["market"]), Date: d(q, "date"), Symbol: opt(q, "symbol")})
+		},
 	}
 }
 

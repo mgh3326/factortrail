@@ -28,6 +28,7 @@ type Retro interface {
 	DataGaps(context.Context, *autotrader.DataGapsParams) (autotrader.Result, error)
 	RetroTrades(context.Context, *autotrader.RetroTradesParams) (autotrader.Result, error)
 	RetroDecisions(context.Context, *autotrader.RetroDecisionsParams) (autotrader.Result, error)
+	RetroTimeline(context.Context, *autotrader.RetroTimelineParams) (autotrader.Result, error)
 }
 
 // errNoUpstream is what a retro tool answers when the process started without
@@ -104,6 +105,14 @@ type retroDecisionsIn struct {
 	From   string  `json:"from"`
 	To     string  `json:"to"`
 	Market *string `json:"market,omitempty"`
+	Symbol *string `json:"symbol,omitempty"`
+	Limit  *int    `json:"limit,omitempty"`
+	Cursor *string `json:"cursor,omitempty"`
+}
+
+type retroTimelineIn struct {
+	Market string  `json:"market"`
+	Date   string  `json:"date"`
 	Symbol *string `json:"symbol,omitempty"`
 	Limit  *int    `json:"limit,omitempty"`
 	Cursor *string `json:"cursor,omitempty"`
@@ -371,6 +380,24 @@ func registerRetroDecisions(s *gmcp.Server, b Retro) {
 				market = &v
 			}
 			return b.RetroDecisions(ctx, &autotrader.RetroDecisionsParams{From: from, To: to, Market: market, Symbol: in.Symbol, Limit: in.Limit, Cursor: in.Cursor})
+		})
+}
+
+func registerRetroTimeline(s *gmcp.Server, b Retro) {
+	addRetroTool(s, b, "retro_timeline",
+		"Per-symbol evidence for one KST trading date and market: the observation, screener pick, decision, proposal, order and fill events behind each symbol's closed state, with the day's coverage. Rows and events are returned as the upstream gives them."+retroNote,
+		objectSchema([]string{"market", "date"}, map[string]*jsonschema.Schema{
+			"market": marketProp(),
+			"date":   dateProp("KST trading date, YYYY-MM-DD."),
+			"symbol": &jsonschema.Schema{Type: "string", Pattern: `^[A-Za-z0-9_.:/\-]{1,32}$`, Description: "Symbol."},
+		}),
+		func(ctx context.Context, b Retro, in retroTimelineIn) (autotrader.Result, error) {
+			d, err := parseDate("date", in.Date)
+			if err != nil {
+				return nil, err
+			}
+			market := autotrader.RetroTimelineParamsMarket(in.Market)
+			return b.RetroTimeline(ctx, &autotrader.RetroTimelineParams{Market: market, Date: d, Symbol: in.Symbol, Limit: in.Limit, Cursor: in.Cursor})
 		})
 }
 

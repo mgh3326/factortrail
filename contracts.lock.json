@@ -4,10 +4,10 @@
     {
       "name": "autotrader-retro-v1",
       "source_repo": "https://github.com/mgh3326/auto_trader",
-      "source_commit": "93533dc4810343f6517f741b61ee93ce54c0c927",
+      "source_commit": "e4df5641ecfc9c9d6e95799a1f3720c1832f8d9b",
       "source_path": "contracts/retro/v1/openapi.yaml",
       "path": "contracts/autotrader/retro/v1/openapi.yaml",
-      "sha256": "8a6e44dbb4aed049b4127cdf71e3042e1cd119ec3b06d2aa8739a20cacf5b40a",
+      "sha256": "49fe39407f2508ebd957a778e680774e554d8e172653315f84aef60e5fff22a8",
       "examples_source_path": "contracts/retro/v1/examples",
       "examples": [
         {
@@ -61,6 +61,10 @@
         {
           "path": "contracts/autotrader/retro/v1/examples/retro_symbol.yaml",
           "sha256": "826d9e839e86ab1ec3f8e81d4787c22446d546d1602cb848d1ff18920a37f5c3"
+        },
+        {
+          "path": "contracts/autotrader/retro/v1/examples/retro_timeline.yaml",
+          "sha256": "003e72ec24f732c64b28873b25a8c785a90274bcbfe004151752014bdade5ece"
         },
         {
           "path": "contracts/autotrader/retro/v1/examples/retro_trades.yaml",

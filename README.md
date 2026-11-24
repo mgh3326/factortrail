@@ -6,9 +6,9 @@ Factortrail (팩터트레일) is a Go service for investment data, analysis, and
 
 ## Status
 
-P0 provides ten read-only MCP tools backed by the `retro/v1` HTTP API of [auto_trader](https://github.com/mgh3326/auto_trader). Factortrail does not read a database directly and has no write or order path.
+P0 provides eleven read-only MCP tools backed by the `retro/v1` HTTP API of [auto_trader](https://github.com/mgh3326/auto_trader). Factortrail does not read a database directly and has no write or order path.
 
-This build serves the `retro` profile with the ten tools, behind Cloudflare Access authentication, through a client generated from a pinned copy of the auto_trader contract. See [docs/service.md](docs/service.md).
+This build serves the `retro` profile with the eleven tools, behind Cloudflare Access authentication, through a client generated from a pinned copy of the auto_trader contract. See [docs/service.md](docs/service.md).
 
 Later capabilities may own data quality, datasets, and analysis when their value, source of truth, validation, migration, and rollback are established.
 
