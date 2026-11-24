@@ -334,3 +334,7 @@ func (p *Provider) RetroTrades(ctx context.Context, q *RetroTradesParams) (Resul
 func (p *Provider) RetroDecisions(ctx context.Context, q *RetroDecisionsParams) (Result, error) {
 	return p.call(ctx, func(ctx context.Context) (*http.Response, error) { return p.client.RetroDecisions(ctx, q) })
 }
+
+func (p *Provider) RetroTimeline(ctx context.Context, q *RetroTimelineParams) (Result, error) {
+	return p.call(ctx, func(ctx context.Context) (*http.Response, error) { return p.client.RetroTimeline(ctx, q) })
+}

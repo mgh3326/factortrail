@@ -21,6 +21,7 @@ type Upstream interface {
 	DataGaps(context.Context, *autotrader.DataGapsParams) (autotrader.Result, error)
 	RetroTrades(context.Context, *autotrader.RetroTradesParams) (autotrader.Result, error)
 	RetroDecisions(context.Context, *autotrader.RetroDecisionsParams) (autotrader.Result, error)
+	RetroTimeline(context.Context, *autotrader.RetroTimelineParams) (autotrader.Result, error)
 }
 
 // ObservedUpstream counts and times every upstream call, and reports the
@@ -75,6 +76,10 @@ func (u *ObservedUpstream) RetroTrades(ctx context.Context, q *autotrader.RetroT
 
 func (u *ObservedUpstream) RetroDecisions(ctx context.Context, q *autotrader.RetroDecisionsParams) (autotrader.Result, error) {
 	return u.call("retro_decisions", func() (autotrader.Result, error) { return u.next.RetroDecisions(ctx, q) })
+}
+
+func (u *ObservedUpstream) RetroTimeline(ctx context.Context, q *autotrader.RetroTimelineParams) (autotrader.Result, error) {
+	return u.call("retro_timeline", func() (autotrader.Result, error) { return u.next.RetroTimeline(ctx, q) })
 }
 
 func (u *ObservedUpstream) call(op string, do func() (autotrader.Result, error)) (autotrader.Result, error) {

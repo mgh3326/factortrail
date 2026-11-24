@@ -123,7 +123,7 @@ func args(q map[string]string) map[string]any {
 	return out
 }
 
-func TestRetroProfileIsExactlyTheTenContractTools(t *testing.T) {
+func TestRetroProfileIsExactlyTheElevenContractTools(t *testing.T) {
 	p, err := lookupProfile("retro")
 	if err != nil {
 		t.Fatal(err)
@@ -495,8 +495,8 @@ func TestUnregisteredToolsAreRefusedWithoutAnUpstreamCall(t *testing.T) {
 // Without upstream settings the tools stay listed, and a call says so.
 func TestToolsAnswerWhenTheUpstreamIsNotConfigured(t *testing.T) {
 	cs := connect(t, newServer("test", retroTools, nil, nil))
-	if got := listNames(t, cs); len(got) != 10 {
-		t.Fatalf("tools/list = %v, want 10 tools", got)
+	if got := listNames(t, cs); len(got) != 11 {
+		t.Fatalf("tools/list = %v, want 11 tools", got)
 	}
 	res, err := cs.CallTool(ctxT(t), &gmcp.CallToolParams{Name: "data_gaps", Arguments: map[string]any{}})
 	if err != nil {

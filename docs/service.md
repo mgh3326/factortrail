@@ -39,7 +39,7 @@ there is no default and no dynamic filtering.
 
 `tools/call` and `tools/list` are checked against the active profile on every
 request, so a handler that exists on the server but is not in the profile is
-neither listed nor callable. The `retro` profile has exactly the ten tools
+neither listed nor callable. The `retro` profile has exactly the eleven tools
 listed under [Retro tools](#retro-tools) and no other.
 
 Adding a tool is one row in the profile's table plus its handler.
@@ -64,7 +64,7 @@ A flag overrides its environment variable. Values never live in Git.
 | `--dev` | flag only | local testing mode, see below |
 
 The two upstream settings go together: both set, or both unset. With neither,
-the process starts, the ten retro tools stay listed, and each call answers
+the process starts, the eleven retro tools stay listed, and each call answers
 that the upstream is not configured.
 
 The upstream read token (`RETRO_API_READ_TOKEN` on the auto_trader side) is
@@ -161,7 +161,7 @@ enforced as in production; a partial set is still refused.
 
 ## Retro tools
 
-The `retro` profile serves ten read-only tools. A tool's name is the
+The `retro` profile serves eleven read-only tools. A tool's name is the
 `operationId` of the pinned contract, its inputs are exactly the query
 parameters of that operation (same names, required set, types, bounds, `tf`
 enum and cursor pattern), and it calls that one operation once.
@@ -178,6 +178,7 @@ enum and cursor pattern), and it calls that one operation once.
 | `data_gaps` | `GET /trading/api/retro/v1/data_gaps` |
 | `retro_trades` | `GET /trading/api/retro/v1/retro_trades` |
 | `retro_decisions` | `GET /trading/api/retro/v1/retro_decisions` |
+| `retro_timeline` | `GET /trading/api/retro/v1/retro_timeline` |
 
 Input schemas are closed: an argument that is not a contract parameter (a
 URL, a path, an operation name) is refused before any upstream request. The
@@ -279,7 +280,7 @@ listener has no authentication, so the address must be a loopback IP literal:
 
 Label values come from fixed sets: `route` is `/mcp`, `/healthz` or `other`;
 `class` is the status class (`2xx`, `4xx`, ...); `tool` and `operation` are the
-ten retro tools or `other`; `outcome` is `ok`, one of the eight contract
+eleven retro tools or `other`; `outcome` is `ok`, one of the eight contract
 error codes or `other`. No path, token, email or user input is a label. The
 standard Go and process collectors are not registered.
 

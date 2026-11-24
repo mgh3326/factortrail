@@ -21,7 +21,7 @@ type tool struct {
 // profiles is the static profile table. A server starts with exactly one of
 // these; there is no dynamic filtering and no default profile.
 //
-// The retro profile holds exactly the ten operations of the pinned
+// The retro profile holds exactly the eleven operations of the pinned
 // auto_trader retro/v1 contract; a tool's name is its operationId.
 var profiles = map[string][]tool{
 	"retro": retroTools,
@@ -38,6 +38,7 @@ var retroTools = []tool{
 	{"data_gaps", registerDataGaps},
 	{"retro_trades", registerRetroTrades},
 	{"retro_decisions", registerRetroDecisions},
+	{"retro_timeline", registerRetroTimeline},
 }
 
 // lookupProfile returns the tools of the named profile. The name must match
